@@ -1,15 +1,16 @@
-from app import app
-
-
-@app.route('/')
-@app.route('/index')
-def index():
-    return "Hello, World!"
+from flask import request
+from app import app, db
+from app.xml_schema import CreateFromDocument
+from app.obj2db import Pyxb2DB
 
 
 @app.route('/import', methods=['POST'])
 def import_xml():
-    pass
+    xml_input = request.data
+    xml_cls = CreateFromDocument(xml_text=xml_input)
+    db_obj = Pyxb2DB(xml_cls).map()
+    db.session.add(db_obj)
+    db.session.commit()
 
 
 @app.route('/annotation', methods=['POST'])
