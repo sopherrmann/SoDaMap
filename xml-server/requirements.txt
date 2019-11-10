@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 Flask-Migrate
 Geoalchemy2
 PyXB
+psycopg2-binary
