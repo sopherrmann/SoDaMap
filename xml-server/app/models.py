@@ -7,14 +7,14 @@ from app import db
 class MappedSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     inserted = db.Column(db.DateTime, default=datetime.now)
-    modified = db.Column(db.DateTime, onupdate=datetime.now)
+    modified = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     start_application_time_stamp = db.Column(db.DateTime, nullable=False)
     end_application_time_stamp = db.Column(db.DateTime, nullable=False)
 
+    # relations
     user_positions = db.relationship('UserPosition', back_populates='mapped_session', cascade='all, delete-orphan')
     map_interactions = db.relationship('MapInteraction', back_populates='mapped_session', cascade='all, delete-orphan')
     map_searches = db.relationship('MapSearch', back_populates='mapped_session', cascade='all, delete-orphan')
-    # TODO not a list obj can only occures once!
     routing = db.relationship('Routing', back_populates='mapped_session', uselist=False, cascade='all, delete-orphan')
     questions = db.relationship('Question', back_populates='mapped_session', cascade='all, delete-orphan')
     spatial_bookmarks = db.relationship('SpatialBookmark', back_populates='mapped_session', cascade='all, delete-orphan')
