@@ -1,0 +1,11 @@
+# generated files
+**/.idea/*
+*__pycache__*
+
+# Environment variables
+envs/*
+
+# virtual environment
+**/venv/*
+
+map-service/*
