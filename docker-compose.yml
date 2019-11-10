@@ -1,0 +1,42 @@
+version: '3'
+services:
+  postgis:
+    container_name: wb-postgis
+    image: mdillon/postgis
+    env_file:
+      - envs/postgis.env
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+    restart: on-failure
+  pgAdmin:
+    container_name: wb-pgAdmin
+    image: dpage/pgadmin4
+    depends_on:
+      - postgis
+    env_file:
+      - envs/pgadmin.env
+    restart: on-failure
+    ports:
+      - 8081:80
+  geoserver:
+    container_name: wb-geoserver
+    image: kartoza/geoserver
+    volumes:
+      - geoserver-data:/opt/geoserver/data_dir
+    ports:
+      - 8082:8080
+    restart: on-failure
+    env_file:
+      - envs/geoserver.env
+  xmlserver:
+    container_name: wb-xmlserver
+    build: ./xml-server
+    image: wb-xmlserver
+    ports:
+      - 5000:5000
+    env_file:
+      - envs/xmlserver.env
+
+volumes:
+  postgis-data:
+  geoserver-data:
