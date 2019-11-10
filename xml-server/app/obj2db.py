@@ -18,7 +18,7 @@ class Pyxb2DB:
             user_positions=self.get_user_positions(),
             map_interactions=self.get_map_interaction(),
             map_searches=self.get_map_searches(),
-            routings=self.get_routing(),
+            routing=self.get_routing(),
             questions=self.get_questions(),
             spatial_bookmarks=self.get_spatial_bookmarks(),
         )
@@ -49,8 +49,7 @@ class Pyxb2DB:
             db_map_interactions.append(map_interaction)
         return db_map_interactions
 
-    @staticmethod
-    def get_map_interaction_type(mt: schema.mapInteractionType, map_interaction: dbm.MapInteraction) -> dbm.MapInteraction:
+    def get_map_interaction_type(self, mt: schema.mapInteractionType, map_interaction: dbm.MapInteraction) -> dbm.MapInteraction:
 
         if mt.clickInteraction:
             ul = mt.clickInteraction.BBox.upperLeftCorner
@@ -62,26 +61,37 @@ class Pyxb2DB:
             map_interaction.new_bbox_geom = create_bbox_from_obj(ul=ul, lr=lr)
 
         elif mt.panInteraction:
-            new_ul = mt.panInteraction.newBBox.lowerRightCorner
-            new_lr = mt.panInteraction.newBBox.upperLeftCorner
-            old_ul = mt.panInteraction.oldBBox.lowerRightCorner
-            old_lr = mt.panInteraction.oldBBox.upperLeftCorner
-
             map_interaction.is_pan_interaction = True
-            map_interaction.new_bbox_time_stamp_lr = new_lr.timeStamp
-            map_interaction.new_bbox_time_stamp_ul = new_ul.timeStamp
-            map_interaction.new_bbox_geom = create_bbox_from_obj(ul=new_ul, lr=new_lr)
-            map_interaction.old_bbox_time_stamp_lr = old_lr.timeStamp
-            map_interaction.old_bbox_time_stamp_ul = old_ul.timeStamp
-            map_interaction.old_bbox_geom = create_bbox_from_obj(ul=old_ul, lr=old_lr)
+            map_interaction = self.fill_old_new_bbox(mt, 'panInteraction', map_interaction)
 
-        # TODO implement ZoomInInteraction
         elif mt.zoomInInteraction:
-            pass
-        # TODO implement ZoomOutInteraction
-        elif mt.zoomOutInteraction:
-            pass
+            map_interaction.is_zoom_in_interaction = True
+            map_interaction = self.fill_old_new_bbox(mt, 'zoomInInteraction', map_interaction)
+            map_interaction.old_zoom_level = mt.zoomInInteraction.oldZoomLevel
+            map_interaction.new_zoom_level = mt.zoomInInteraction.newZoomLevel
 
+        elif mt.zoomOutInteraction:
+            map_interaction.is_zoom_out_interaction = True
+            map_interaction = self.fill_old_new_bbox(mt, 'zoomOutInteraction', map_interaction)
+            map_interaction.old_zoom_level = mt.zoomOutInteraction.oldZoomLevel
+            map_interaction.new_zoom_level = mt.zoomOutInteraction.newZoomLevel
+
+        return map_interaction
+
+    @staticmethod
+    def fill_old_new_bbox(mt: schema.mapInteractionType, map_interaction_name: str, map_interaction: dbm.MapInteraction):
+        attr = getattr(mt, map_interaction_name)
+        new_ul = attr.newBBox.upperLeftCorner
+        new_lr = attr.newBBox.lowerRightCorner
+        old_ul = attr.oldBBox.upperLeftCorner
+        old_lr = attr.oldBBox.lowerRightCorner
+
+        map_interaction.new_bbox_time_stamp_lr = new_lr.timeStamp
+        map_interaction.new_bbox_time_stamp_ul = new_ul.timeStamp
+        map_interaction.new_bbox_geom = create_bbox_from_obj(ul=new_ul, lr=new_lr)
+        map_interaction.old_bbox_time_stamp_lr = old_lr.timeStamp
+        map_interaction.old_bbox_time_stamp_ul = old_ul.timeStamp
+        map_interaction.old_bbox_geom = create_bbox_from_obj(ul=old_ul, lr=old_lr)
         return map_interaction
 
     def get_map_searches(self) -> List[dbm.MapSearch]:
@@ -98,7 +108,7 @@ class Pyxb2DB:
             db_ms = dbm.MapSearch(
                 starttime_stamp=ms.StarttimeStamp,
                 endtime_stamp=ms.EndtimeStamp,
-                text_with_suggestions=self.get_text_with_suggestions(ms.textWithSuggestions),
+                text_with_suggestion=self.get_text_with_suggestions(ms.textWithSuggestions),
             )
             set_bbox()
             db_map_searches.append(db_ms)
@@ -145,13 +155,13 @@ class Pyxb2DB:
             )
         return db_spatial_bookmarks
 
-    def get_text_with_suggestions(self, tws: List[schema.textWithSuggestions]) -> List[dbm.TextWithSuggestions]:
+    def get_text_with_suggestions(self, tws: List[schema.textWithSuggestions]) -> List[dbm.TextWithSuggestion]:
         return [self.create_text_with_suggestion(t) for t in tws]
 
     @staticmethod
-    def create_text_with_suggestion(t: schema.textWithSuggestions) -> dbm.TextWithSuggestions:
-        return dbm.TextWithSuggestions(
+    def create_text_with_suggestion(t: schema.textWithSuggestions) -> dbm.TextWithSuggestion:
+        return dbm.TextWithSuggestion(
             text_typed=t.textTyped,
             suggestion_chosen=t.suggestionChosen,
-            suggestions=[dbm.Suggestions(suggestion=sug) for sug in t.suggestions] if t.suggestions else [],
+            suggestions=[dbm.Suggestion(suggestion=sug) for sug in t.suggestions] if t.suggestions else [],
         )

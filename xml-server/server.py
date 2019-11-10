@@ -2,7 +2,7 @@ from datetime import datetime
 
 from app import app, db
 from app.models import MappedSession, UserPosition, MapInteraction, \
-    MapSearch, Routing, Question, SpatialBookmark, TextWithSuggestions, Suggestions
+    MapSearch, Routing, Question, SpatialBookmark, TextWithSuggestion, Suggestion
 from app.utils import create_bbox, create_point
 
 
@@ -16,9 +16,13 @@ def make_shell_context():
             'Routing': Routing,
             'Question': Question,
             'SpatialBookmark': SpatialBookmark,
-            'TextWithSuggestions': TextWithSuggestions,
-            'Suggestions': Suggestions,
+            'TextWithSuggestions': TextWithSuggestion,
+            'Suggestions': Suggestion,
             'datetime': datetime,
             'create_point': create_point,
             'create_polygon': create_bbox,
             }
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

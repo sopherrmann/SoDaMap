@@ -7,6 +7,10 @@ def create_point(x: float, y: float, srid: int=None):
     return f'SRID={srid};POINT({x} {y})'
 
 
+def create_bbox(ul: List[float], lr: List[float], srid: int=None):
+    return _create_bbox(*ul, *lr, srid)
+
+
 def _create_bbox(xmin: float, ymax: float, xmax: float, ymin: float, srid: int=None):
     srid = srid if srid else 4326
     coords = f'({xmin} {ymin}, {xmin} {ymax}, {xmax} {ymax}, {xmax} {ymax}, {xmin} {ymin})'
@@ -14,10 +18,10 @@ def _create_bbox(xmin: float, ymax: float, xmax: float, ymin: float, srid: int=N
 
 
 def create_bbox_from_obj(ul: geocoordinateWithTimeStamp, lr: geocoordinateWithTimeStamp, srid: int=None):
-    _create_bbox(
-        xmin=ul.longitude,
-        ymax=ul.latitude,
-        xmax=lr.longitude,
-        ymin=lr.latitude,
+    return _create_bbox(
+        xmin=min(ul.longitude, lr.longitude),
+        xmax=max(ul.longitude, lr.longitude),
+        ymin=min(ul.latitude, lr.latitude),
+        ymax=max(ul.latitude, lr.latitude),
         srid=srid,
     )
