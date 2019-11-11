@@ -1,0 +1,124 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing:border-box;
+}
+h2 {
+    margin-top: 5px !important;
+}
+/* Style page content */
+.main {
+    margin-left: 160px; /* Same as the width of the sidebar */
+    padding: 0 10px;
+    float: inside;
+}
+/* The sidebar menu */
+.sidenavi {
+    height: 720px;
+    width: 160px; /* Set the width of the sidebar */
+    position: relative; /* Fixed Sidebar (stay in place on scroll) */
+    float: left;
+    background-color: #111; /* Black */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+}
+/* The navigation menu links */
+.sidenavi a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+}
+/* When you mouse over the navigation links, change their color */
+.sidenavi a:hover {
+    color: #f1f1f1;
+    cursor: pointer;
+}
+
+#map {
+    margin-top: 10px;
+    height: 700px;
+}
+.mapboxgl-ctrl-geocoder--input{
+    width: 50%;
+}
+.geocoder-dropdown-item{
+    padding: 5px;
+}
+.geocoder-dropdown-icon{
+    margin-right: 10px;
+}
+.geocoder-dropdown-text{
+    color: #5a3fc0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: larger;
+}
+
+.header {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    background: cornflowerblue;
+    color: white;
+    font-size: 25px;
+}
+.page-footer {
+    margin-top: 10px;
+    background: cornflowerblue !important;
+}
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+
+/* The Modal (background) */
+.input {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+/* Input Content */
+.input-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    animation-name: animatecenter;
+    animation-duration: 0.4s
+}
+/* Input Header */
+.input-header {
+    padding: 2px 16px;
+    background-color: cornflowerblue;
+    color: white;
+}
+
+/* Input Body */
+.input-body {padding: 2px 16px;}
+
+/* The Close Button */
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus {
+    color: #5a5a5a;
+    text-decoration: none;
+    cursor: pointer;
+}
