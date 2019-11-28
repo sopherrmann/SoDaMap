@@ -5,12 +5,30 @@ from app.obj2db import Pyxb2DB
 from app.repository import *
 from app.utils import time_to_timestamp, apply_to_entity
 from app.xml_schema import CreateFromDocument
+from app.models import SessionType
 
 
 @app.route('/mapped_sessions', methods=['GET'])
 def route_get_mapped_sessions():
-    mapped_sessions = get_mapped_sessions()
-    ms = [{'id': m.id} for m in mapped_sessions]
+    ms = get_mapped_session_description(get_mapped_sessions())
+    return jsonify({
+        'status': 200,
+        'mapped_sessions': ms
+    })
+
+
+@app.route('/mapped_sessions/mapped')
+def route_get_mapped_sessions_mapped():
+    ms = get_mapped_session_description(get_mapped_sessions(SessionType.mapped))
+    return jsonify({
+        'status': 200,
+        'mapped_sessions': ms
+    })
+
+
+@app.route('/mapped_sessions/web')
+def route_get_mapped_sessions_web():
+    ms = get_mapped_session_description(get_mapped_sessions(SessionType.web))
     return jsonify({
         'status': 200,
         'mapped_sessions': ms
@@ -48,7 +66,8 @@ def route_annotation(entity_type: str, entity_id: int):
     if entity_type not in get_annotable_entities():
         return forge_error(400, f'Entity of type {entity_type} can not be annotated.')
 
-    insert_annotation(entity_type, entity_id, cur_annotation)
+    annotation_entity = create_annotation_entity(cur_annotation)
+    insert_annotation(entity_type, entity_id, annotation_entity)
     return jsonify({
         "status": 200,
         "entity": entity_type,

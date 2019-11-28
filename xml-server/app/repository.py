@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import List
 
 from sqlalchemy.orm import joinedload
 
@@ -22,10 +23,20 @@ def get_annotable_entities():
     return [k for k in TABLE_MAPPING.keys() if TABLE_MAPPING[k].annotatable]
 
 
-def get_mapped_sessions():
-    return db.session.query(MappedSession)\
-        .filter(MappedSession.session_type == SessionType.mapped)\
-        .all()
+def get_mapped_sessions(session_type: SessionType = None):
+    if session_type:
+        return db.session.query(MappedSession)\
+            .filter(MappedSession.session_type == session_type)\
+            .all()
+    return db.session.query(MappedSession).all()
+
+
+def get_mapped_session_description(mapped_sessions: List[MappedSession]):
+    return [{'id': m.id} for m in mapped_sessions]
+
+
+def create_annotation_entity(annotation_txt: str) -> Annotation:
+    return Annotation(annotation=annotation_txt)
 
 
 def insert_annotation(entity: str, entity_id: int, annotation: Annotation):

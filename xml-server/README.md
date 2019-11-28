@@ -56,9 +56,13 @@ returns a list of annotatable entities
 adds a given annotation to the specified entity
 1. ``/mapped_sessions/new`` [POST]:  
 creates a new *mapped session* in the database. This is used for logging. A log session is also stored as mapped session.
+1. ``/mapped_sessions/<mapped_session_id>`` [PATCH]:  
+Updates a given attribute of a mapped session. Currently only the the end_application_time_stamp can be updated.
+
+**in progress**
+1. ``/mapped_sessions/<mapped_session_id>/<entitiy_type>`` [POST]:  
+Adds an additional entity of the specified entity_type to the given mapped_session.
 
 **to be implemented**
-1. ``/logs`` [POST]:   
-is used to store a log message in the database
-1. ``/logs`` [GET]:   
-returns all available lob messages in xml format
+1. ``/mapped_sessions/<mapped_session_id>`` [GET]:   
+return the given mapped_session as XML file. Should be used to retrieve log sessions as XML.

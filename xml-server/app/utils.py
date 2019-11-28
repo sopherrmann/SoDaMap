@@ -1,4 +1,6 @@
+from datetime import datetime
 from typing import List
+
 from app.xml_schema import geocoordinateWithTimeStamp
 
 
@@ -26,6 +28,20 @@ def create_bbox_from_obj(ul: geocoordinateWithTimeStamp, lr: geocoordinateWithTi
         srid=srid,
     )
 
+
+def apply_to_entity(json_dict: dict, entity):
+    entity_attibutes = [a for a in dir(entity) if not a.startswith('__')]
+    prohibited = ['id']
+    for key in entity_attibutes:
+        if key not in prohibited and key in json_dict:
+            if str(entity.__table__.c[key].type) == 'DATETIME':
+                setattr(entity, key, time_to_timestamp(json_dict[key]))
+            else:
+                setattr(entity, key, json_dict[key])
+    return entity
+
+
 def time_to_timestamp(time) -> datetime:
     # TODO: Settle on timestamp format
-    return datetime.fromtimestamp(time)
+    fmt = '%Y-%m-%dT%H:%M:%S.%f'
+    return datetime.strptime(time, fmt)
