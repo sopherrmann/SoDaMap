@@ -1,11 +1,20 @@
-from geoalchemy2.types import Geometry
+import enum
 from datetime import datetime
+
+from geoalchemy2.types import Geometry
 
 from app import db
 
 
+class SessionType(enum.Enum):
+    mapped = 'MappedSession'
+    web = 'WebSession'
+
+
 class MappedSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    session_type = db.Column(db.Enum(SessionType), default=SessionType.mapped, nullable=False)
+
     inserted = db.Column(db.DateTime, default=datetime.now)
     modified = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     start_application_time_stamp = db.Column(db.DateTime, nullable=False)

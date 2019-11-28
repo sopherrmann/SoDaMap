@@ -55,17 +55,43 @@ def route_annotation(entity_type: str, entity_id: int):
         "entity_identifier": entity_id,
     })
 
+
+# need to get one web_session_id per web session (equivalent to mapped_session but when using the webGIS)
+@app.route('/mapped_sessions/new', methods=['POST'])
+def route_create_new_mapped_session():
+    web_session_id = get_new_web_session_id()
     return jsonify({
         "status": 200,
-        "identifier": mapped_session_id,
-        "inserted": inserted,
-        "modified": modified,
+        "web_session_id": web_session_id
     })
 
 
-@app.route('/logs', methods=['GET', 'POST'])
-def get_all_logs():
-    # get all logs
-    # for POST add new log comment
-    pass
+@app.route('/mapped_sessions/<int:mapped_session_id>', methods=['PATCH'])
+def route_update_mapped_session(mapped_session_id: int):
+    # Currently end time is only value which can be updated
+    end_time = time_to_timestamp(request.json['end_time'])
+    to_update = get_mapped_session_by_id(mapped_session_id)
 
+    if not to_update:
+        return forge_error_404()
+
+    to_update.end_application_time_stamp = end_time
+    update_mapped_session(mapped_session_id, to_update)
+
+    return jsonify({
+        "status": 200,
+        "web_session_id": mapped_session_id,
+    })
+
+
+
+
+def forge_error_404():
+    return forge_error(404, "Not found")
+
+
+def forge_error(status_code: int, message: str):
+    return jsonify({
+        "status": status_code,
+        "message": message
+    }), status_code

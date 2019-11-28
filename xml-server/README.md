@@ -54,6 +54,8 @@ is used to upload mapped session xml files following the schema into the databas
 returns a list of annotatable entities
 1. ``/annotation/<entity_type>/<entity_id>`` [POST]:  
 adds a given annotation to the specified entity
+1. ``/mapped_sessions/new`` [POST]:  
+creates a new *mapped session* in the database. This is used for logging. A log session is also stored as mapped session.
 
 **to be implemented**
 1. ``/logs`` [POST]:   

@@ -25,3 +25,7 @@ def create_bbox_from_obj(ul: geocoordinateWithTimeStamp, lr: geocoordinateWithTi
         ymax=max(ul.latitude, lr.latitude),
         srid=srid,
     )
+
+def time_to_timestamp(time) -> datetime:
+    # TODO: Settle on timestamp format
+    return datetime.fromtimestamp(time)
