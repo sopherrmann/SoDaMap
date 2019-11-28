@@ -1,7 +1,7 @@
 from typing import List
 
-import app.xml_schema as schema
 import app.models as dbm
+import app.xml_schema as schema
 from app.utils import create_point, create_bbox_from_obj
 
 
@@ -11,6 +11,7 @@ class Pyxb2DB:
         self.xml = xml_cls
         self.db = None
 
+    # TODO mapping in other direction is needed for logs
     def map(self) -> dbm.MappedSession:
         self.db = dbm.MappedSession(
             start_application_time_stamp=self.xml.startApplicationTimeStamp,

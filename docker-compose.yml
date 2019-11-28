@@ -8,6 +8,8 @@ services:
     volumes:
       - postgis-data:/var/lib/postgresql/data
     restart: on-failure
+    ports:
+      - 7432:5432
   pgAdmin:
     container_name: wb-pgAdmin
     image: dpage/pgadmin4

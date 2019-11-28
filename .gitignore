@@ -9,3 +9,5 @@ envs/*
 **/venv/*
 
 map-service/*
+
+xml-server/OuputDataSchema.xsd
