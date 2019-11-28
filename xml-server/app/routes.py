@@ -1,14 +1,15 @@
 from flask import request, jsonify
-from app import app, db
-from app.xml_schema import CreateFromDocument
-from app.models import MappedSession
+
+from app import app
 from app.obj2db import Pyxb2DB
-from app.db_manage import insert_annotation
+from app.repository import *
+from app.utils import time_to_timestamp, apply_to_entity
+from app.xml_schema import CreateFromDocument
 
 
 @app.route('/mapped_sessions', methods=['GET'])
-def get_mapped_sessions():
-    mapped_sessions = db.session.query(MappedSession).all()
+def route_get_mapped_sessions():
+    mapped_sessions = get_mapped_sessions()
     ms = [{'id': m.id} for m in mapped_sessions]
     return jsonify({
         'status': 200,
@@ -17,7 +18,7 @@ def get_mapped_sessions():
 
 
 @app.route('/mapped_sessions/import', methods=['POST'])
-def import_xml():
+def route_import_xml():
     xml_input = request.data
     xml_cls = CreateFromDocument(xml_text=xml_input)
     db_obj = Pyxb2DB(xml_cls).map()
@@ -31,10 +32,29 @@ def import_xml():
     })
 
 
-@app.route('/mapped_sessions/<mapped_session_id>/annotation', methods=['POST'])
-def annotation(mapped_session_id):
+@app.route('/annotation/entity_types', methods=['GET'])
+def route_get_annotatable_entities():
+    entities = get_annotable_entities()
+    return jsonify({
+        "status": 200,
+        "entity_types": ', '.join(entities)
+    })
+
+
+@app.route('/annotation/<string:entity_type>/<int:entity_id>', methods=['POST'])
+def route_annotation(entity_type: str, entity_id: int):
     cur_annotation = request.json['annotation']
-    inserted, modified = insert_annotation(mapped_session_id, cur_annotation)
+
+    if entity_type not in get_annotable_entities():
+        return forge_error(400, f'Entity of type {entity_type} can not be annotated.')
+
+    insert_annotation(entity_type, entity_id, cur_annotation)
+    return jsonify({
+        "status": 200,
+        "entity": entity_type,
+        "entity_identifier": entity_id,
+    })
+
     return jsonify({
         "status": 200,
         "identifier": mapped_session_id,

@@ -37,17 +37,23 @@ docker run --name xmlserver xmlserver-img
 To explicitly set the location of the database add the following to the run statement
 ``--env DATABASE_URL=postgresql://username:password@host:port/db_name``
 
+### Using docker-compose
+
+In the SoDaMap repository a docker-compose file is provided. This also includes the XMLServer. Therefore by running the
+docker-compose also this component will be running. (See SoDaMap README for more detailed explanation.)
+
 ## Available endpoints
 
-Currently three endpoints available:
+**already available**:
 
 1. ``/mapped_sessions`` [GET]:  
 returns a list of already inserted mapped_sessions
 1. ``/mapped_sessions/import`` [POST]:  
-is used to upload mapped session xml files following the schema.
-1. ``/mapped_sessions/<mapped_session_id>/annotation`` [POST]:  
-adds an annotation to the given mapped_session. A JSON body of the following schema needs to be passed:
-{"annotation": "your annotation text"}
+is used to upload mapped session xml files following the schema into the database.
+1. ``/annotation/<entity_types>`` [GET]:  
+returns a list of annotatable entities
+1. ``/annotation/<entity_type>/<entity_id>`` [POST]:  
+adds a given annotation to the specified entity
 
 **to be implemented**
 1. ``/logs`` [POST]:   

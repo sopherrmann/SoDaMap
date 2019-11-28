@@ -18,13 +18,14 @@ class MappedSession(db.Model):
     routing = db.relationship('Routing', back_populates='mapped_session', uselist=False, cascade='all, delete-orphan')
     questions = db.relationship('Question', back_populates='mapped_session', cascade='all, delete-orphan')
     spatial_bookmarks = db.relationship('SpatialBookmark', back_populates='mapped_session', cascade='all, delete-orphan')
-    annotations = db.relationship('Annotation', back_populates='mapped_session')
+    annotations = db.relationship('Annotation')
 
 
 class UserPosition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mapped_session_id = db.Column(db.Integer, db.ForeignKey('mapped_session.id'))
     mapped_session = db.relationship('MappedSession', back_populates='user_positions')
+    annotation = db.relationship('Annotation')
 
     time_stamp = db.Column(db.DateTime, nullable=False)
     geom = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
@@ -34,6 +35,7 @@ class MapInteraction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mapped_session_id = db.Column(db.Integer, db.ForeignKey('mapped_session.id'))
     mapped_session = db.relationship('MappedSession')
+    annotation = db.relationship('Annotation')
 
     time_stamp = db.Column(db.DateTime, nullable=False)
     geom = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
@@ -61,6 +63,7 @@ class MapSearch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mapped_session_id = db.Column(db.Integer, db.ForeignKey('mapped_session.id'))
     mapped_session = db.relationship('MappedSession', back_populates='map_searches')
+    annotation = db.relationship('Annotation')
 
     starttime_stamp = db.Column(db.DateTime, nullable=False)
     endtime_stamp = db.Column(db.DateTime, nullable=False)
@@ -76,6 +79,7 @@ class Routing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mapped_session_id = db.Column(db.Integer, db.ForeignKey('mapped_session.id'))
     mapped_session = db.relationship('MappedSession', back_populates='routing')
+    annotation = db.relationship('Annotation')
 
     start_routing_interface_time_stamp = db.Column(db.DateTime, nullable=False)
     end_routing_interface_send_request_or_interface_closed_time_sta = db.Column(db.DateTime, nullable=False)
@@ -119,6 +123,7 @@ class SpatialBookmark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mapped_session_id = db.Column(db.Integer, db.ForeignKey('mapped_session.id'))
     mapped_session = db.relationship('MappedSession', back_populates='spatial_bookmarks')
+    annotation = db.relationship('Annotation')
 
     time_stamp = db.Column(db.DateTime, nullable=False)
     geom = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
@@ -147,5 +152,10 @@ class Suggestion(db.Model):
 class Annotation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mapped_session_id = db.Column(db.Integer, db.ForeignKey('mapped_session.id'))
-    mapped_session = db.relationship('MappedSession', back_populates='annotations')
+    user_position_id = db.Column(db.Integer, db.ForeignKey('user_position.id'))
+    map_interaction_id = db.Column(db.Integer, db.ForeignKey('map_interaction.id'))
+    map_search_id = db.Column(db.Integer, db.ForeignKey('map_search.id'))
+    routing_id = db.Column(db.Integer, db.ForeignKey('routing.id'))
+    spatial_bookmark_id = db.Column(db.Integer, db.ForeignKey('spatial_bookmark.id'))
+
     annotation = db.Column(db.Text, nullable=False)
