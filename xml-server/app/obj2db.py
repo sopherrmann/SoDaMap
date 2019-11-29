@@ -126,11 +126,11 @@ class Pyxb2DB:
             destination_text_box_history=self.get_destination_routing(r.DestiantionTextBoxHistory)
         )
 
-    def get_orig_routing(self, tws: List[schema.textWithSuggestions]) -> List[dbm.RoutingOrigin]:
-        return [dbm.RoutingOrigin(text_with_suggestion=self.create_text_with_suggestion(t)) for t in tws]
+    def get_orig_routing(self, tws: List[schema.textWithSuggestions]) -> dbm.RoutingOrigin:
+        return dbm.RoutingOrigin(text_with_suggestion=self.get_text_with_suggestions(tws))
 
-    def get_destination_routing(self, tws: List[schema.textWithSuggestions]) -> List[dbm.RoutingDestination]:
-        return [dbm.RoutingDestination(text_with_suggestion=self.create_text_with_suggestion(t)) for t in tws]
+    def get_destination_routing(self, tws: List[schema.textWithSuggestions]) -> dbm.RoutingDestination:
+        return dbm.RoutingDestination(text_with_suggestion=self.get_text_with_suggestions(tws))
 
     def get_questions(self) -> List[dbm.Question]:
         db_questions = []

@@ -1,4 +1,4 @@
-"""empty message
+"""Add session type col
 
 Revision ID: 86697f03e85b
 Revises: 6c7b56b35fa5

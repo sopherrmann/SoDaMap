@@ -26,7 +26,8 @@ class MappedSession(db.Model):
     map_searches = db.relationship('MapSearch', back_populates='mapped_session', cascade='all, delete-orphan')
     routing = db.relationship('Routing', back_populates='mapped_session', uselist=False, cascade='all, delete-orphan')
     questions = db.relationship('Question', back_populates='mapped_session', cascade='all, delete-orphan')
-    spatial_bookmarks = db.relationship('SpatialBookmark', back_populates='mapped_session', cascade='all, delete-orphan')
+    spatial_bookmarks = db.relationship('SpatialBookmark', back_populates='mapped_session',
+                                        cascade='all, delete-orphan')
     annotations = db.relationship('Annotation')
 
 
@@ -81,7 +82,8 @@ class MapSearch(db.Model):
     bbox_geom = db.Column(Geometry(geometry_type='POLYGON', srid=4326))
 
     text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='map_search',
-                                            cascade='all, delete-orphan')  # min 1
+                                           cascade='all, delete-orphan')  # min 1
+
 
 
 class Routing(db.Model):
@@ -95,8 +97,8 @@ class Routing(db.Model):
     start_routing_time_stamp = db.Column(db.DateTime)
     end_routing_time_stamp = db.Column(db.DateTime)
 
-    origin_text_box_history = db.relationship('RoutingOrigin', cascade='all, delete-orphan')
-    destination_text_box_history = db.relationship('RoutingDestination', cascade='all, delete-orphan')
+    origin_text_box_history = db.relationship('RoutingOrigin', cascade='all, delete-orphan', uselist=False)  # min 1
+    destination_text_box_history = db.relationship('RoutingDestination', cascade='all, delete-orphan', uselist=False)  # min 1
 
 
 # Join Table
@@ -104,9 +106,8 @@ class RoutingOrigin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     routing_id = db.Column(db.Integer, db.ForeignKey('routing.id'), nullable=False)
     routing = db.relationship('Routing', back_populates='origin_text_box_history', uselist=False)
-    text_with_suggestion_id = db.Column(db.Integer, db.ForeignKey('text_with_suggestion.id'), nullable=False)
-    text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='routing_origin', uselist=False,
-                                           cascade='all, delete-orphan', single_parent=True)
+    text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='routing_origin',
+                                           cascade='all, delete-orphan')
 
 
 # Join Table
@@ -114,9 +115,9 @@ class RoutingDestination(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     routing_id = db.Column(db.Integer, db.ForeignKey('routing.id'), nullable=False)
     routing = db.relationship('Routing', back_populates='destination_text_box_history', uselist=False)
-    text_with_suggestion_id = db.Column(db.Integer, db.ForeignKey('text_with_suggestion.id'), nullable=False)
-    text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='routing_destination', uselist=False,
-                                           cascade='all, delete-orphan', single_parent=True)
+    text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='routing_destination',
+                                           cascade='all, delete-orphan')
+
 
 
 class Question(db.Model):
@@ -143,7 +144,9 @@ class TextWithSuggestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     map_search_id = db.Column(db.Integer, db.ForeignKey('map_search.id'))
     map_search = db.relationship('MapSearch', back_populates='text_with_suggestion')
+    routing_origin_id = db.Column(db.Integer, db.ForeignKey('routing_origin.id'))
     routing_origin = db.relationship('RoutingOrigin', back_populates='text_with_suggestion', uselist=False)
+    routing_destination_id = db.Column(db.Integer, db.ForeignKey('routing_destination.id'))
     routing_destination = db.relationship('RoutingDestination', back_populates='text_with_suggestion', uselist=False)
 
     text_typed = db.Column(db.Text, nullable=False)
