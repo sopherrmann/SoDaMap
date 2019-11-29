@@ -32,7 +32,13 @@ def create_bbox_from_obj(ul: geocoordinateWithTimeStamp, lr: geocoordinateWithTi
 
 def apply_to_entity(json_dict: dict, entity):
     entity_attributes = [a for a in dir(entity) if not a.startswith('__')]
-    prohibited = ['id']
+    prohibited = ['id', 'routing_id', 'mapped_session_id']
+    not_nullable_col = [col.name for col in entity.__table__.c if not col.nullable and col.name not in prohibited]
+
+    # all not nullable columns are set
+    for c in not_nullable_col:
+        if c not in json_dict:
+            raise ValueError(f"Mandatory column '{c}' is missing")
 
     # handle geom fields (points and polygons)
     if 'geom' in entity_attributes:
