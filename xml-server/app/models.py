@@ -40,6 +40,9 @@ class UserPosition(db.Model):
     time_stamp = db.Column(db.DateTime, nullable=False)
     geom = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
 
+    def __repr__(self):
+        return f'UserPosition(time={self.time_stamp}, geom={self.geom})'
+
 
 class MapInteraction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,6 +71,16 @@ class MapInteraction(db.Model):
     old_zoom_level = db.Column(db.Integer)
     new_zoom_level = db.Column(db.Integer)
 
+    def __repr__(self):
+        if self.is_click_interaction:
+            return f'MapInteraction(Click, time={self.time_stamp}, geom={self.geom})'
+        if self.is_zoom_in_interaction:
+            return f'MapInteraction(ZoomIn, time={self.time_stamp}, zoomLevel=({self.old_zoom_level} to {self.new_zoom_level}))'
+        if self.is_zoom_out_interaction:
+            return f'MapInteraction(ZoomOut, time={self.time_stamp}, zoomLevel=({self.old_zoom_level} to {self.new_zoom_level}))'
+        if self.is_pan_interaction:
+            return f'MapInteraction(Pan, time={self.time_stamp})'
+
 
 class MapSearch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -84,6 +97,8 @@ class MapSearch(db.Model):
     text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='map_search',
                                            cascade='all, delete-orphan')  # min 1
 
+    def __repr__(self):
+        return f'MapSearch(start_time={self.starttime_stamp}, end_time={self.endtime_stamp}, TextWithSug={self.text_with_suggestion})'
 
 
 class Routing(db.Model):
@@ -100,6 +115,9 @@ class Routing(db.Model):
     origin_text_box_history = db.relationship('RoutingOrigin', cascade='all, delete-orphan', uselist=False)  # min 1
     destination_text_box_history = db.relationship('RoutingDestination', cascade='all, delete-orphan', uselist=False)  # min 1
 
+    def __repr__(self):
+        return f'Routing(OriginTextBox={self.origin_text_box_history}, DestinationTextBox={self.destination_text_box_history})'
+
 
 # Join Table
 class RoutingOrigin(db.Model):
@@ -108,6 +126,9 @@ class RoutingOrigin(db.Model):
     routing = db.relationship('Routing', back_populates='origin_text_box_history', uselist=False)
     text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='routing_origin',
                                            cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'RoutingOrigin(TextWithSug={self.text_with_suggestion})'
 
 
 # Join Table
@@ -118,6 +139,8 @@ class RoutingDestination(db.Model):
     text_with_suggestion = db.relationship('TextWithSuggestion', back_populates='routing_destination',
                                            cascade='all, delete-orphan')
 
+    def __repr__(self):
+        return f'RoutingDestination(TextWithSug={self.text_with_suggestion})'
 
 
 class Question(db.Model):
@@ -127,6 +150,9 @@ class Question(db.Model):
 
     question = db.Column(db.Text, nullable=False)
     answer = db.Column(db.Text)
+
+    def __repr__(self):
+        return f'Question(question={self.question}, answer={self.answer})'
 
 
 class SpatialBookmark(db.Model):
@@ -138,6 +164,9 @@ class SpatialBookmark(db.Model):
     time_stamp = db.Column(db.DateTime, nullable=False)
     geom = db.Column(Geometry(geometry_type='POINT', srid=4326), nullable=False)
     notes = db.Column(db.Text)
+
+    def __repr__(self):
+        return f'SpatialBookmark(time={self.time_stamp}, geom={self.geom})'
 
 
 class TextWithSuggestion(db.Model):
@@ -153,12 +182,18 @@ class TextWithSuggestion(db.Model):
     suggestion_chosen = db.Column(db.Text)
     suggestions = db.relationship('Suggestion')
 
+    def __repr__(self):
+        return f'TextWithSuggestion(TextTyped={self.text_typed}, SugChosen{self.suggestion_chosen}, Suggestions={self.suggestions})'
+
 
 class Suggestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text_with_suggestion_id = db.Column(db.Integer, db.ForeignKey('text_with_suggestion.id'))
     text_with_suggestion = db.relationship('TextWithSuggestion')
     suggestion = db.Column(db.Text)
+
+    def __repr__(self):
+        return f'Suggestion({self.suggestion})'
 
 
 class Annotation(db.Model):
@@ -171,3 +206,6 @@ class Annotation(db.Model):
     spatial_bookmark_id = db.Column(db.Integer, db.ForeignKey('spatial_bookmark.id'))
 
     annotation = db.Column(db.Text, nullable=False)
+
+    def __repr__(self):
+        return f'Annotation({self.annotation})'
