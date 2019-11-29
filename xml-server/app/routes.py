@@ -103,6 +103,47 @@ def route_update_mapped_session(mapped_session_id: int):
     })
 
 
+@app.route('/mapped_sessions/entity_types', methods=['GET'])
+def route_get_entity_types_to_update():
+    entities = get_updateable_entities()
+    return jsonify({
+        "status": 200,
+        "entity_types": ', '.join(entities)
+    })
+
+
+@app.route('/mapped_sessions/<int:mapped_session_id>/<string:entity_type>', methods=['POST'])
+def route_write_log(mapped_session_id: int, entity_type: str):
+    if entity_type not in get_updateable_entities():
+        return forge_error(400, f'Unknown type {entity_type}')
+    entity_mapper = TABLE_MAPPING[entity_type]
+
+    mapped_session = get_mapped_session_by_id_eager(mapped_session_id, entity_mapper.attr)
+    if not mapped_session:
+        return forge_error_404()
+
+    # create database entity
+    data = request.json
+    entity = apply_to_entity(data, entity_mapper.table())
+
+    complete_entity = getattr(mapped_session, entity_mapper.attr_name)
+    # assumed that all entities will be a list in the future > TODO check
+    if isinstance(complete_entity, list):
+        complete_entity.append(entity)
+        output = [str(i) for i in complete_entity]
+    else:
+        complete_entity = entity
+        output = str(complete_entity)
+    setattr(mapped_session, entity_type, complete_entity)
+
+    # TODO: Catch "missing not null" stuff and return a 400 - Missing required attribute
+    update_mapped_session(mapped_session_id, mapped_session)
+
+    return jsonify({
+        "status": 200,
+        "updated_entity": entity_type,
+        "new_value": output,
+    })
 
 
 def forge_error_404():

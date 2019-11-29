@@ -1,0 +1,16 @@
+{
+  "time_stamp": "2019-01-01T01:03:00.2",
+  "geom": {
+    "x": 16.301443,
+    "y": 48.156500
+  },
+  "is_click_interaction": true,
+  "new_bbox_time_stamp_lr": "2019-03-01T01:03:00.0",
+  "new_bbox_time_stamp_ul": "2019-03-01T01:02:00.0",
+  "new_bbox_geom": {
+    "xmin": 16.364609,
+    "xmax": 16.407084,
+    "ymin": 48.137074,
+    "ymax": 48.160224
+  }
+}

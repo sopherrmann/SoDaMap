@@ -5,22 +5,26 @@ from sqlalchemy.orm import joinedload
 
 from app.models import *
 
-Mapper = namedtuple('Mapper', 'table attr annotatable')
+Mapper = namedtuple('Mapper', 'table attr attr_name annotatable updateable')
 
 # Map entity type to table
 TABLE_MAPPING = {
-    'mapped_session': Mapper(MappedSession, MappedSession, True),
-    'user_position': Mapper(UserPosition, MappedSession.user_positions, True),
-    'map_interaction': Mapper(MapInteraction, MappedSession.map_interactions, True),
-    'map_search': Mapper(MapSearch, MappedSession.map_searches, True),
-    'routing': Mapper(Routing, MappedSession.routing, True),
-    'spatial_bookmark': Mapper(SpatialBookmark, MappedSession.spatial_bookmarks, True),
-    'question': Mapper(Question, MappedSession.questions, False),
+    'mapped_session': Mapper(MappedSession, MappedSession, 'mapped_session', True, False),
+    'user_position': Mapper(UserPosition, MappedSession.user_positions, 'user_positions', True, True),
+    'map_interaction': Mapper(MapInteraction, MappedSession.map_interactions, 'map_interactions', True, True),
+    'map_search': Mapper(MapSearch, MappedSession.map_searches, 'map_searches', True, True),
+    'routing': Mapper(Routing, MappedSession.routing, 'routing', True, True),
+    'spatial_bookmark': Mapper(SpatialBookmark, MappedSession.spatial_bookmarks, 'spatial_bookmarks', True, True),
+    'question': Mapper(Question, MappedSession.questions, 'questions', False, True),
 }
 
 
 def get_annotable_entities():
     return [k for k in TABLE_MAPPING.keys() if TABLE_MAPPING[k].annotatable]
+
+
+def get_updateable_entities():
+    return [k for k in TABLE_MAPPING if TABLE_MAPPING[k].updateable]
 
 
 def get_mapped_sessions(session_type: SessionType = None):

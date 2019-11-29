@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 
 from app.xml_schema import geocoordinateWithTimeStamp
+from app.models import TextWithSuggestion, Suggestion, RoutingOrigin, RoutingDestination
 
 
 def create_point(x: float, y: float, srid: int = None):
@@ -30,11 +31,35 @@ def create_bbox_from_obj(ul: geocoordinateWithTimeStamp, lr: geocoordinateWithTi
 
 
 def apply_to_entity(json_dict: dict, entity):
-    entity_attibutes = [a for a in dir(entity) if not a.startswith('__')]
+    entity_attributes = [a for a in dir(entity) if not a.startswith('__')]
     prohibited = ['id']
-    for key in entity_attibutes:
+
+    # handle geom fields (points and polygons)
+    if 'geom' in entity_attributes:
+        json_dict['geom'] = create_point(**json_dict['geom'])
+    bbox_field_names = [b for b in entity_attributes if 'bbox' in b and 'geom' in b and b in json_dict]
+    for bbox_name in bbox_field_names:
+        json_dict[bbox_name] = _create_bbox(**json_dict[bbox_name])
+
+    # Handle fancy routing TextWithSuggestion
+    if 'origin_text_box_history' in entity_attributes:
+        json_dict['origin_text_box_history'] = apply_to_entity(json_dict['origin_text_box_history'], RoutingOrigin())
+    if 'destination_text_box_history' in entity_attributes:
+        json_dict['destination_text_box_history'] = apply_to_entity(json_dict['destination_text_box_history'], RoutingDestination())
+
+    # Handle text_with_suggestion
+    # suggestion table references back to text_with_suggestion
+    if 'text_with_suggestion' in entity_attributes and not isinstance(entity, Suggestion):
+        json_dict['text_with_suggestion'] = [apply_to_entity(tws, TextWithSuggestion())
+                                             for tws in json_dict['text_with_suggestion']]
+    # Suggestions are not mandatory for a TextWithSuggestion entity
+    if 'suggestions' in entity_attributes and 'suggestions' in json_dict:
+        json_dict['suggestions'] = [apply_to_entity(sug, Suggestion()) for sug in json_dict['suggestions']]
+
+    for key in entity_attributes:
         if key not in prohibited and key in json_dict:
-            if str(entity.__table__.c[key].type) == 'DATETIME':
+            # transform date for columns(!) of type datetime > check needed as also relations can be set here
+            if key in entity.__table__.c and str(entity.__table__.c[key].type) == 'DATETIME':
                 setattr(entity, key, time_to_timestamp(json_dict[key]))
             else:
                 setattr(entity, key, json_dict[key])
