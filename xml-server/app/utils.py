@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import List
+from shapely import wkb
+from binascii import unhexlify
 
 from app.xml_schema import geocoordinateWithTimeStamp
 from app.models import TextWithSuggestion, Suggestion, RoutingOrigin, RoutingDestination
@@ -78,3 +80,14 @@ def time_to_timestamp(time) -> datetime:
     # TODO: Settle on timestamp format
     fmt = '%Y-%m-%dT%H:%M:%S.%f'
     return datetime.strptime(time, fmt)
+
+
+def wkb_to_xy(wkb_input: str):
+    binary = unhexlify(str(wkb_input).encode('utf-8'))
+    geom = wkb.loads(binary)
+
+    if geom.geom_type == 'Point':
+        return geom.x, geom.y
+    if geom.geom_type == 'Polygon':
+        # returns minx, miny, maxx, maxy
+        return geom.bounds

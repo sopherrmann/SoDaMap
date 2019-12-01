@@ -1,10 +1,9 @@
-from flask import request, jsonify
+from flask import request, jsonify, Response
 
 from app import app
-from app.obj2db import Pyxb2DB
+from app.obj2db import get_db_from_xml, get_xml_from_db_id
 from app.repository import *
 from app.utils import time_to_timestamp, apply_to_entity
-from app.xml_schema import CreateFromDocument
 from app.models import SessionType
 
 
@@ -38,8 +37,7 @@ def route_get_mapped_sessions_web():
 @app.route('/mapped_sessions/import', methods=['POST'])
 def route_import_xml():
     xml_input = request.data
-    xml_cls = CreateFromDocument(xml_text=xml_input)
-    db_obj = Pyxb2DB(xml_cls).map()
+    db_obj = get_db_from_xml(xml_input)
     db.session.add(db_obj)
     db.session.commit()
 
@@ -85,22 +83,26 @@ def route_create_new_mapped_session():
     })
 
 
-@app.route('/mapped_sessions/<int:mapped_session_id>', methods=['PATCH'])
+@app.route('/mapped_sessions/<int:mapped_session_id>', methods=['PATCH', 'GET'])
 def route_update_mapped_session(mapped_session_id: int):
-    # Currently end time is only value which can be updated
-    end_time = time_to_timestamp(request.json['end_time'])
-    to_update = get_mapped_session_by_id(mapped_session_id)
+    if request.method == 'PATCH':
+        # Currently end time is only value which can be updated
+        end_time = time_to_timestamp(request.json['end_time'])
+        to_update = get_mapped_session_by_id(mapped_session_id)
 
-    if not to_update:
-        return forge_error_404()
+        if not to_update:
+            return forge_error_404()
 
-    to_update.end_application_time_stamp = end_time
-    update_mapped_session(mapped_session_id, to_update)
+        to_update.end_application_time_stamp = end_time
+        update_mapped_session(mapped_session_id, to_update)
 
-    return jsonify({
-        "status": 200,
-        "web_session_id": mapped_session_id,
-    })
+        return jsonify({
+            "status": 200,
+            "web_session_id": mapped_session_id,
+        })
+    if request.method == 'GET':
+        xml = get_xml_from_db_id(mapped_session_id)
+        return Response(xml, mimetype='text/xml')
 
 
 @app.route('/mapped_sessions/entity_types', methods=['GET'])

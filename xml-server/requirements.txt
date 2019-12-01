@@ -4,3 +4,4 @@ Flask-Migrate
 Geoalchemy2
 PyXB
 psycopg2-binary
+shapely
