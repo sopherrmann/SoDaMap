@@ -17,7 +17,6 @@ class ParserXMLDB:
     def set_db_from_id(self):
         self.db = db.session.query(dbm.MappedSession).get(self.db_id)
 
-    # TODO mapping in other direction is needed for logs
     def set_db(self) -> None:
         if self.db:
             return
