@@ -44,16 +44,25 @@ docker-compose also this component will be running. (See SoDaMap README for more
 
 ## Available endpoints
 
-**already available**:
-
+*general information*
 1. ``/mapped_sessions`` [GET]:  
-returns a list of already inserted mapped_sessions
+returns a list of all mapped_sessions
+1. ``/mapped_sessions/mapped`` [GET]:  
+returns a list of all mapped_sessions created from a xml insertion
+1. ``/mapped_sessions/web`` [GET]:  
+returns a list of all mapped_sessions which were manually created
+
+*import*
 1. ``/mapped_sessions/import`` [POST]:  
 is used to upload mapped session xml files following the schema into the database.
+
+*annotation*
 1. ``/annotation/<entity_types>`` [GET]:  
 returns a list of annotatable entities
 1. ``/annotation/<entity_type>/<entity_id>`` [POST]:  
 adds a given annotation to the specified entity
+
+*Web session management*
 1. ``/mapped_sessions/new`` [POST]:  
 creates a new *mapped session* in the database. This is used for logging. A log session is also stored as mapped session.
 1. ``/mapped_sessions/<mapped_session_id>`` [PATCH]:  

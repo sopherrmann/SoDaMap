@@ -43,6 +43,8 @@ def apply_to_entity(json_dict: dict, entity):
     # handle geom fields (points and polygons)
     if 'geom' in entity_attributes:
         json_dict['geom'] = create_point(**json_dict['geom'])
+    if 'where_clicked_geom' in entity_attributes:
+        json_dict['where_clicked_geom'] = create_point(**json_dict['where_clicked_geom'])
     bbox_field_names = [b for b in entity_attributes if 'bbox' in b and 'geom' in b and b in json_dict]
     for bbox_name in bbox_field_names:
         json_dict[bbox_name] = _create_bbox(**json_dict[bbox_name])

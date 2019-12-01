@@ -71,6 +71,10 @@ class MapInteraction(db.Model):
     old_zoom_level = db.Column(db.Integer)
     new_zoom_level = db.Column(db.Integer)
 
+    # for click
+    where_clicked_geom = db.Column(Geometry(geometry_type='POINT', srid=4326))
+    where_clicked_time_stamp = db.Column(db.DateTime)
+
     def __repr__(self):
         if self.is_click_interaction:
             return f'MapInteraction(Click, time={self.time_stamp}, geom={self.geom})'
@@ -149,7 +153,7 @@ class Question(db.Model):
     mapped_session = db.relationship('MappedSession', back_populates='questions')
 
     question = db.Column(db.Text, nullable=False)
-    answer = db.Column(db.Text)
+    answer = db.Column(db.Text, nullable=False)
 
     def __repr__(self):
         return f'Question(question={self.question}, answer={self.answer})'

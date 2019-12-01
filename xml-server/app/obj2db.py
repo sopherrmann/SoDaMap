@@ -44,7 +44,7 @@ class Pyxb2DB:
             map_interaction = dbm.MapInteraction(
                 time_stamp=mu.timeStamp,
                 geom=create_point(x=mu.longitude, y=mu.latitude),
-                )
+            )
             # Add content from MapInteractionType part
             map_interaction = self.get_map_interaction_type(m.mapInteractionTypeName, map_interaction)
             db_map_interactions.append(map_interaction)
@@ -55,11 +55,15 @@ class Pyxb2DB:
         if mt.clickInteraction:
             ul = mt.clickInteraction.BBox.upperLeftCorner
             lr = mt.clickInteraction.BBox.lowerRightCorner
+            where_clicked = mt.clickInteraction.whereClicked
 
             map_interaction.is_click_interaction = True
-            map_interaction.new_bbox_time_stamp_lr = lr.timeStamp,
-            map_interaction.new_bbox_time_stamp_ul = ul.timeStamp,
+            map_interaction.new_bbox_time_stamp_lr = lr.timeStamp
+            map_interaction.new_bbox_time_stamp_ul = ul.timeStamp
             map_interaction.new_bbox_geom = create_bbox_from_obj(ul=ul, lr=lr)
+
+            map_interaction.where_clicked_geom = create_point(x=where_clicked.longitude, y=where_clicked.latitude)
+            map_interaction.where_clicked_time_stamp = where_clicked.timeStamp
 
         elif mt.panInteraction:
             map_interaction.is_pan_interaction = True
@@ -100,9 +104,9 @@ class Pyxb2DB:
             if ms.BBox:
                 lr = ms.BBox.lowerRightCorner
                 ul = ms.BBox.upperLeftCorner
-                db_ms.bbox_time_stamp_lr = lr.timeStamp,
-                db_ms.bbox_time_stamp_ul = ul.timeStamp,
-                db_ms.bbox_geom = create_bbox_from_obj(ul=ul, lr=lr),
+                db_ms.bbox_time_stamp_lr = lr.timeStamp
+                db_ms.bbox_time_stamp_ul = ul.timeStamp
+                db_ms.bbox_geom = create_bbox_from_obj(ul=ul, lr=lr)
 
         db_map_searches = []
         for ms in self.xml.mapSearchsElements.mapSearchElement:
