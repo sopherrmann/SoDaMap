@@ -3,9 +3,72 @@
     padding: 0;
     box-sizing:border-box;
 }
-h2 {
-    margin-top: 5px !important;
+html {
+    line-height: 1.5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-weight: normal;
+    color: rgba(0, 0, 0, 0.87);
 }
+a {
+    background-color: transparent;
+    text-decoration: none;
+}
+@media only screen and (min-width: 0) {
+    html {
+        font-size: 14px;
+    }
+}
+@media only screen and (min-width: 992px) {
+    html {
+        font-size: 14.5px;
+    }
+}
+@media only screen and (min-width: 1200px) {
+    html {
+        font-size: 15px;
+    }
+}
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 400;
+    line-height: 1.3;
+}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    font-weight: inherit;
+}
+h1 {
+    font-size: 4.2rem;
+    line-height: 110%;
+    margin: 2.8rem 0 1.68rem 0;
+}
+h2 {
+    font-size: 3.56rem;
+    line-height: 110%;
+    margin-top: 5px
+}
+h3 {
+    font-size: 2.92rem;
+    line-height: 110%;
+    margin: 1.9466666667rem 0 1.168rem 0;
+}
+h4 {
+    font-size: 2.28rem;
+    line-height: 110%;
+    margin: 1.52rem 0 0.912rem 0;
+}
+h5 {
+    font-size: 1.64rem;
+    line-height: 110%;
+    margin: 1.0933333333rem 0 0.656rem 0;
+}
+h6 {
+    font-size: 1.15rem;
+    line-height: 110%;
+    margin: 0.7666666667rem 0 0.46rem 0;
+}
+em {
+    font-style: italic;
+}
+
 /* Style page content */
 .main {
     margin-left: 160px; /* Same as the width of the sidebar */
@@ -13,46 +76,76 @@ h2 {
     float: inside;
 }
 /* The sidebar menu */
-.sidenavi {
-    height: 720px;
+.sidenav {
+    height: 770px;
     width: 160px; /* Set the width of the sidebar */
     position: relative; /* Fixed Sidebar (stay in place on scroll) */
     float: left;
     background-color: #111; /* Black */
     overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px;
+    padding-top: 10px;
 }
 /* The navigation menu links */
-.sidenavi a {
+.sidenav a {
     padding: 6px 8px 6px 16px;
     text-decoration: none;
     font-size: 25px;
-    color: #818181;
+    color: white;
     display: block;
 }
 /* When you mouse over the navigation links, change their color */
-.sidenavi a:hover {
-    color: #f1f1f1;
+.sidenav a:hover {
+    color: cornflowerblue;
     cursor: pointer;
+}
+/* Style the sidenav links and the dropdown button */
+.sidenav a, .dropdown-btn {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: white;
+    display: block;
+    border: none;
+    background: none;
+    width:100%;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+}
+/* On mouse-over */
+.sidenav a:hover, .dropdown-btn:hover {
+    color: cornflowerblue;
+}
+.sidenav p {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: white;
+    display: block;
+}
+.sidenav p:hover {
+    color: cornflowerblue;
+    cursor: pointer;
+}
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+}
+
+/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
+.dropdown-container {
+    display: none;
+    background-color: #262626;
+    padding-left: 8px;
 }
 
 #map {
-    margin-top: 10px;
-    height: 700px;
+    margin: 10px 0;
+    height: 750px;
 }
-.mapboxgl-ctrl-geocoder--input{
-    width: 50%;
-}
-.geocoder-dropdown-item{
-    padding: 5px;
-}
-.geocoder-dropdown-icon{
+.geocoder-dropdown-icon {
     margin-right: 10px;
-}
-.geocoder-dropdown-text{
-    color: #5a3fc0;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: larger;
 }
 
 .header {
@@ -64,13 +157,104 @@ h2 {
     font-size: 25px;
 }
 .page-footer {
-    margin-top: 10px;
-    background: cornflowerblue !important;
+    color: white;
+    background: cornflowerblue;
+    padding-top: 10px;
 }
-/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
+.page-footer .footer-copyright {
+    overflow: hidden;
+    min-height: 50px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 10px 0;
+    color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(51, 51, 51, 0.08);
+}
+.container {
+    margin: 0 auto;
+    width: 100%;
+}
+@media only screen and (min-width: 601px) {
+    .container {
+        width: 85%;
+    }
+}
+@media only screen and (min-width: 993px) {
+    .container {
+        width: 70%;
+    }
+}
+.row {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+}
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* Style the forms */
+#regForm {
+    background-color: #ffffff;
+    margin: 100px auto;
+    padding: 40px;
+    width: 70%;
+    min-width: 300px;
+}
+
+/* Style the input fields */
+input {
+    padding: 10px;
+    width: 100%;
+    font-size: 17px;
+    font-family: Raleway;
+    border: 1px solid #aaaaaa;
+}
+
+input[type="radio"] {
+    width: 30%;
+    cursor: pointer;
+}
+
+.quest {
+     font-size: 17px;
+     font-family: Raleway;
+ }
+
+.onAgree {
+    display: none;
+}
+
+/* Styles of the personal questionnaire */
+.rangeOut {
+    float: right;
+    width: 5%;
+}
+
+/* Styles of the upload questionnaire */
+.likert {
+    padding:10px 20px 5px 20px;
+}
+.likert li {
+    display: inline-block;
+    padding:0 10px 0 10px;
+    list-style-type: none;
+}
+.likert input[type="radio"] {
+    width: auto;
+    padding: 5px;
 }
 
 /* The Modal (background) */
@@ -107,7 +291,11 @@ h2 {
 }
 
 /* Input Body */
-.input-body {padding: 2px 16px;}
+.input-body {
+    padding: 2px 16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
 
 /* The Close Button */
 .close {

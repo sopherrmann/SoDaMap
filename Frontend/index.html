@@ -5,12 +5,10 @@
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 	<title>SoDa GIS</title>
 
-	<link rel="stylesheet" href="css/main.css"/>
+	<link type="text/css" rel="stylesheet" href="css/main.css"  media="screen, projection"/>
 
 	<!--Import Google Icon Font-->
-	<!--Import materialize.css-->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-	<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen, projection"/>
 	<!--Mapbox Map-->
    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.js'></script>
    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.5.0/mapbox-gl.css' rel='stylesheet' />
@@ -24,19 +22,82 @@
 
 <body>
 <div class="header">
-	<h2><a href="index.html" style="color: white">SoDa GIS</a></h2>
+	<h2 style="color: white">SoDa GIS</h2>
 	<p>The ultimate GIS experience</p>
 </div>
 
+<!-- Questionnaire about personal info -->
+<!-- Todo: Save the infos and don't show it again... But only if it isn't to much -->
+<div id="personalInfo" class="input">
+	<div class="input-content">
+		<div class="input-header">
+			<span class="close">&times;</span>
+			<h2>Personal Information</h2>
+		</div>
+		<div class="input-body" onload="validateForm()">
+			<p>Please enter some personal information for research purpose. If already done, just close this modal.</p>
+			<br>
+			<div class="tab">General Info:
+				<p><input type="text" placeholder="First name" oninput="this.className = ''"></p>
+				<p><input type="text" placeholder="Last name" oninput="this.className = ''"></p>
+				<p><input type="number" placeholder="Age" oninput="this.className=''"></p>
+			</div>
+			<br>
+			<div class="tab">Gender:<br>
+				<input type="radio" name="gender" value="male"><a class="quest">Male</a><br>
+				<input type="radio" name="gender" value="female"><a class="quest">Female</a><br>
+			</div>
+			<br>
+			<div class="tab">Handiness:<br>
+				<input type="radio" name="hand" value="right"><a class="quest">Right</a><br>
+				<input type="radio" name="hand" value="left"><a class="quest">Left</a><br>
+			</div>
+			<br>
+			<div class="tab">Color-blindness:<br>
+				<input type="radio" name="blindness" value="yes" onclick="isChecked(1, 0)"><a class="quest">Yes</a><br>
+				<input type="radio" name="blindness" value="no" onclick="isChecked(0, 0)"><a class="quest">No</a><br>
+				<p><input class="onAgree" type="text" placeholder="Type of color blindness" oninput="this.className = ''"></p>
+			</div>
+			<br>
+			<div class="tab">Experience in using GIS applications:<br>
+				<a class="quest">Less</a><a class="quest" style="margin-left: 85.3%">More</a><br>
+				<input type="range" class="experience" name="experience" list="steps" oninput="showVal(this.value)" onchange="showVal(this.value)" style="width: 90%">
+				<input type="number" class="rangeOut" value="50" style="float: right">
+				<datalist id="steps">
+					<option value="0" ></option>
+					<option value="10"></option>
+					<option value="20"></option>
+					<option value="30"></option>
+					<option value="40"></option>
+					<option value="50"></option>
+					<option value="60"></option>
+					<option value="70"></option>
+					<option value="80"></option>
+					<option value="90"></option>
+					<option value="100"></option>
+				</datalist>
+			</div>
+			<input type="submit" id="submitUploadPerson" value="Enter" name="submit" onclick="close()"/>
+		</div>
+	</div>
+</div>
+
 <!-- Side navigation -->
-<div class="sidenavi">
+<div class="sidenav">
 	<a id="search">Search</a>
 	<a id="routing">Route</a>
 	<a id="upload">Upload</a>
+	<a class="dropdown-btn" id="exist">Existing</a>
+	<div class="dropdown-container">
+		<p href="#">Link 1</p>
+		<p href="#">Link 2</p>
+		<p href="#">Link 3</p>
+	</div>
     <a id="addInfo">Add Info</a>
-	<a href="diary_study.html">Diary Study</a>
+	<a id="diary">Diary Study</a>
 </div>
 
+<!-- Upload a file from desktop -->
 <div id="myInput" class="input">
 	<div class="input-content">
 		<div class="input-header">
@@ -44,14 +105,199 @@
 			<h2>XML-Upload</h2>
 		</div>
 		<div class="input-body">
-			<p>Please browse to the xml-file you want to import and press the "Upload File"-button to load it into the database.</p>
+			<p>Please browse to the xml-file you want to import and press the "Upload File"-button to load it into the database.</p><br>
 			<form method="post" enctype="multipart/form-data">
 				<input type="file" name="files[]" multiple />
-				<input type="submit" value="Upload File" name="submit" />
+				<input type="submit" id="submitUpload" value="Upload File" name="submit" />
 			</form>
 		</div>
 	</div>
 </div>
+<!-- After pressing submit open a questionnaire -->
+<div id="uploadQuest" class="input">
+	<div class="input-content">
+		<div class="input-header">
+			<span class="close">&times;</span>
+			<h2>Information about the uploaded file</h2>
+		</div>
+		<div class="input-body">
+			<p>Please enter some information for research purpose.</p>
+			<br>
+			<div class="tab">Context of use:<br>
+				<input type="radio" name="context" value="work"><a class="quest">Work</a><br>
+				<input type="radio" name="context" value="casual"><a class="quest">Casual/Leisure</a><br>
+			</div>
+			<br>
+			<div class="tab">Ease of use:<br>
+				<ul class="likert">
+					<li> Complicated </li>
+					<li><input type="radio" name="use" value="1" /></li>
+					<li><input type="radio" name="use" value="2" /></li>
+					<li><input type="radio" name="use" value="3" /></li>
+					<li><input type="radio" name="use" value="4" /></li>
+					<li><input type="radio" name="use" value="5" /></li>
+					<li><input type="radio" name="use" value="6" /></li>
+					<li><input type="radio" name="use" value="7" /></li>
+					<li> Easy </li>
+				</ul>
+			</div>
+			<br>
+			<div class="tab">How enjoyable was the application?<br>
+				<ul class="likert">
+					<li> Annoying </li>
+					<li><input type="radio" name="enjoyable" value="1" /></li>
+					<li><input type="radio" name="enjoyable" value="2" /></li>
+					<li><input type="radio" name="enjoyable" value="3" /></li>
+					<li><input type="radio" name="enjoyable" value="4" /></li>
+					<li><input type="radio" name="enjoyable" value="5" /></li>
+					<li><input type="radio" name="enjoyable" value="6" /></li>
+					<li><input type="radio" name="enjoyable" value="7" /></li>
+					<li> Enjoyable </li>
+				</ul>
+			</div>
+			<br>
+			<div class="tab">Suggestions for improvements:<br>
+				<p><input id="suggestionsUpload" type="text" placeholder="Suggestions" oninput="this.className = ''"></p>
+			</div>
+			<br>
+			<div class="tab">Did you complete your task successfully?<br>
+				<input type="radio" name="task" value="yes" onclick="isChecked(0, 1)"><a class="quest">Yes</a><br>
+				<input type="radio" name="task" value="no" onclick="isChecked(1, 1)"><a class="quest">No</a><br>
+				<p><input class="onAgree" type="text" placeholder="Why not?" oninput="this.className = ''"></p>
+			</div>
+			<br>
+			<div class="tab">Did the results of the import meet your expectations? <br>
+				<input type="radio" name="expectYN" value="yes" onclick="isChecked(0, 2)"><a class="quest">Yes</a><br>
+				<input type="radio" name="expectYN" value="no" onclick="isChecked(1, 2)"><a class="quest">No</a><br>
+				<p><input class="onAgree" type="text" placeholder="Why not?" oninput="this.className = ''"></p>
+			</div>
+			<br>
+			<div class="tab">Did the visualization appeal to you? <br>
+				<input type="radio" name="visYN" value="yes" onclick="isChecked(0, 3)"><a class="quest">Yes</a><br>
+				<input type="radio" name="visYN" value="no" onclick="isChecked(1, 3)"><a class="quest">No</a><br>
+				<p><input class="onAgree" type="text" placeholder="Why not?" oninput="this.className = ''"></p>
+				</div>
+			</div>
+			<br>
+			<div style="overflow:auto;">
+				<input type="submit" id="submitUploadQuest" value="Enter" name="submit" onclick="close()"/>
+			</div>
+			<br>
+		</div>
+	</div>
+</div>
+
+<!-- Add annotations to the uploaded files -->
+<div id="myAppInfo" class="input">
+	<div class="input-content">
+		<div class="input-header">
+			<span class="close">&times;</span>
+			<h2>Add Info</h2>
+		</div>
+		<div class="input-body">
+			<p>Here you can add info to your uploaded XML-file.</p><br>
+			<form method="post" enctype="multipart/form-data">
+				<p>Please select the XML-file where you want to add your personal quotes.</p>
+				<select>
+					<option value="" selected disabled hidden>Choose here</option>
+					<option value="volvo">Volvo</option>
+					<option value="saab">Saab</option>
+					<option value="opel">Opel</option>
+					<option value="audi">Audi</option>
+				</select>
+				<br>
+				<p>Please select the Point/Route where you want to add it.</p>
+				<select>
+					<option value="" selected disabled hidden>Choose here</option>
+					<option value="volvo">Volvo</option>
+					<option value="saab">Saab</option>
+					<option value="opel">Opel</option>
+					<option value="audi">Audi</option>
+				</select>
+				<br>
+				<p>Annotation:</p>
+				<input type="text" name="answer"/><br><br>
+
+				<input type="submit" value="Submit">
+				<input type="reset"><br>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Diary study questions after browsing session -->
+<div id="myDiary" class="input">
+	<div class="input-content">
+		<div class="input-header">
+			<span class="close">&times;</span>
+			<h2>Diary Study</h2>
+		</div>
+		<div class="input-body">
+			<p>Please answer this few questions before leaving the website.</p>
+			<br>
+			<div class="tab">Reason for planning:<br>
+				<p><input id="reason" type="text" placeholder="Text" oninput="this.className = ''"></p>
+			</div>
+			<div class="tab">Context of use:<br>
+				<input type="radio" name="context" value="work"><a class="quest">Work</a><br>
+				<input type="radio" name="context" value="casual"><a class="quest">Casual/Leisure</a><br>
+			</div>
+			<br>
+			<div class="tab">Ease of use:<br>
+				<ul class="likert">
+					<li> Complicated </li>
+					<li><input type="radio" name="use" value="1" /></li>
+					<li><input type="radio" name="use" value="2" /></li>
+					<li><input type="radio" name="use" value="3" /></li>
+					<li><input type="radio" name="use" value="4" /></li>
+					<li><input type="radio" name="use" value="5" /></li>
+					<li><input type="radio" name="use" value="6" /></li>
+					<li><input type="radio" name="use" value="7" /></li>
+					<li> Easy </li>
+				</ul>
+			</div>
+			<br>
+			<div class="tab">How enjoyable was the application?<br>
+				<ul class="likert">
+					<li> Annoying </li>
+					<li><input type="radio" name="enjoyable" value="1" /></li>
+					<li><input type="radio" name="enjoyable" value="2" /></li>
+					<li><input type="radio" name="enjoyable" value="3" /></li>
+					<li><input type="radio" name="enjoyable" value="4" /></li>
+					<li><input type="radio" name="enjoyable" value="5" /></li>
+					<li><input type="radio" name="enjoyable" value="6" /></li>
+					<li><input type="radio" name="enjoyable" value="7" /></li>
+					<li> Enjoyable </li>
+				</ul>
+			</div>
+			<br>
+			<div class="tab">Familiarity with area of planning:<br>
+				<a class="quest">Less</a><a class="quest" style="margin-left: 85.3%">More</a><br>
+				<input type="range" class="experience" name="experience" list="steps" oninput="showVal(this.value)" onchange="showVal(this.value)" style="width: 90%">
+				<input type="number" class="rangeOut" value="50" style="float: right">
+			</div>
+			<br>
+			<div class="tab">Did you plan alone or in a group?<br>
+				<input type="radio" name="group" value="yes" onclick="isChecked(0, 1)"><a class="quest">Yes</a><br>
+				<input type="radio" name="group" value="no" onclick="isChecked(1, 1)"><a class="quest">No</a><br>
+			</div>
+			<br>
+			<div class="tab">Did you complete your task successfully?<br>
+				<input type="radio" name="task" value="yes" onclick="isChecked(0, 1)"><a class="quest">Yes</a><br>
+				<input type="radio" name="task" value="no" onclick="isChecked(1, 1)"><a class="quest">No</a><br>
+				<p><input class="onAgree" type="text" placeholder="Why not?" oninput="this.className = ''"></p>
+			</div>
+			<br>
+			<div class="tab">Suggestions for improvements:<br>
+				<p><input id="suggestionsBrowse" type="text" placeholder="Suggestions" oninput="this.className = ''"></p><br>
+			</div>
+			<div style="overflow:auto;">
+				<input type="submit" id="submitUploadBrowse" value="Enter" name="submit" onclick="close()"/>
+			</div>
+		</div>
+	</div>
+</div>
+
 
 <div class="main">
 	<div id='map'></div>
@@ -61,30 +307,29 @@
 <div class="page-footer">
 	<div class="container">
 		<div class="row">
-			<div class="col l6 s12">
-				<h5 class="white-text">Implementing a GIS</h5>
-				<p class="grey-text text-lighten-4">Sophie Herman & Daniel Beisteiner</p>
+			<div>
+				<h5>Implementing a GIS</h5>
+				<p>Sophie Herrmann & Daniel Beisteiner</p>
 			</div>
-			<div class="col l4 offset-l2 s12">
-				<h5 class="white-text">Links</h5>
+			<div>
+				<h5 style="float: left">Links</h5>
 				<ul>
-					<li><a class="grey-text text-lighten-3" href="https://www.mapbox.com/">Mapbox</a></li>
+					<a style="float: right" href="https://www.mapbox.com/">Mapbox</a>
 				</ul>
 			</div>
 		</div>
 	</div>
 	<div class="footer-copyright">
 		<div class="container">
-			© 2014 Copyright Text
-			<a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+			<a style="float: left"> © 2014 Copyright Text</a>
+			<!-- Todo: add github link -->
+			<a style="float: right" href="#!">GitHub</a>
 		</div>
 	</div>
 </div>
 
 <!-- JavaScript at end of body for optimized loading -->
 <script type='text/javascript' src="js/map.js"></script>
-<script type="text/javascript" src="js/materialize.min.js"></script>
-
 </body>
 
 </html>
