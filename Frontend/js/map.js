@@ -163,30 +163,11 @@ function routing() {
 // Upload of one Element into a Server
 // Get the modal
 const upload = document.getElementById("myInput");
-document.getElementById("upload").addEventListener('click', uploadF);
-function uploadF() {
+document.getElementById("upload").addEventListener('click', showUploadDialog);
+function showUploadDialog() {
     open();
     upload.style.display = "block";
 }
-
-// Upload to server
-const serverURL = "127.0.0.1:5000";
-const form = document.querySelector('form');
-form.addEventListener('submit', e => {
-    e.preventDefault();
-    const files = document.querySelector('[type=file]').files;
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-        let file = files[i];
-        formData.append('files[]', file)
-    }
-    fetch(serverURL, {
-        method: 'POST',
-        body: formData,
-    }).then(response => {
-        console.log(response)
-    })
-});
 
 //* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content
 // This allows the user to have multiple dropdowns without any conflict */

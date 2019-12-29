@@ -37,14 +37,11 @@ def route_get_mapped_sessions_web():
 @app.route('/mapped_sessions/import', methods=['POST'])
 def route_import_xml():
     xml_input = request.data
-    db_obj = get_db_from_xml(xml_input)
-    db.session.add(db_obj)
-    db.session.commit()
+    db_obj_id = get_db_from_xml(xml_input)
 
     return jsonify({
         "status": 200,
-        "identifier": db_obj.id,
-        "inserted": db_obj.inserted,
+        "identifier": db_obj_id,
     })
 
 

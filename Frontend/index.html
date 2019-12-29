@@ -87,11 +87,8 @@
 	<a id="search">Search</a>
 	<a id="routing">Route</a>
 	<a id="upload">Upload</a>
-	<a class="dropdown-btn" id="exist">Existing</a>
-	<div class="dropdown-container">
-		<p href="#">Link 1</p>
-		<p href="#">Link 2</p>
-		<p href="#">Link 3</p>
+	<a class="dropdown-btn" id="exist-mapped-sessions">Existing</a>
+	<div class="dropdown-container invisible" id="existing-dropdown">
 	</div>
     <a id="addInfo">Add Info</a>
 	<a id="diary">Diary Study</a>
@@ -107,8 +104,8 @@
 		<div class="input-body">
 			<p>Please browse to the xml-file you want to import and press the "Upload File"-button to load it into the database.</p><br>
 			<form method="post" enctype="multipart/form-data">
-				<input type="file" name="files[]" multiple />
-				<input type="submit" id="submitUpload" value="Upload File" name="submit" />
+				<input id="upload-xml-file" type="file" accept="application/xml"/>
+				<input type="button" id="submitUpload" value="Upload File" name="submit" />
 			</form>
 		</div>
 	</div>
@@ -329,7 +326,10 @@
 </div>
 
 <!-- JavaScript at end of body for optimized loading -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
 <script type='text/javascript' src="js/map.js"></script>
+<script type='text/javascript' src="js/xmlServer.js"></script>
+<script type='text/javascript' src="js/GeoServer.js"></script>
 </body>
 
 </html>

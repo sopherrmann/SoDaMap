@@ -123,10 +123,18 @@ em {
     color: white;
     display: block;
 }
-.sidenav p:hover {
+.sidenav p:hover, .sidenav .dropdown-container a:hover {
     color: cornflowerblue;
     cursor: pointer;
 }
+.sidenav .dropdown-container a {
+    padding: 6px 8px 6px 26px;
+    text-decoration: none;
+    font-size: 18px;
+    color: white;
+    display: block;
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
     .sidenav {padding-top: 15px;}
@@ -135,7 +143,6 @@ em {
 
 /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
 .dropdown-container {
-    display: none;
     background-color: #262626;
     padding-left: 8px;
 }
@@ -309,4 +316,8 @@ input[type="radio"] {
     color: #5a5a5a;
     text-decoration: none;
     cursor: pointer;
+}
+
+.invisible {
+    display: none;
 }
