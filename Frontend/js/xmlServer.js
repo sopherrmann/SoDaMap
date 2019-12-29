@@ -52,23 +52,17 @@ $("#exist-mapped-sessions").click(function(){
 });
 
 // Import XML
-// document.querySelector('form').addEventListener('submit', function() {
 $('#submitUpload').click(function () {
     console.log('inside upload xml');
     let file = $('#upload-xml-file')[0].files[0];
-    file.text().then(upload_to_server);
-});
-
-function upload_to_server(xml) {
-    console.log(xml);
     $.ajax({
         url: importUrl,
         type: 'POST',
-        data: xml,
+        data: file,
         contentType: false,
         processData: false,
-        success: function (result) {
+        success: function () {
             console.log('Successfully uploaded file')
         }
     })
-}
+});
