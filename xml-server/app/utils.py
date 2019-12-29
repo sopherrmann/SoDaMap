@@ -76,10 +76,16 @@ def apply_to_entity(json_dict: dict, entity):
     return entity
 
 
-def time_to_timestamp(time) -> datetime:
+def time_to_timestamp(time: str) -> datetime:
     # TODO: Settle on timestamp format
     fmt = '%Y-%m-%dT%H:%M:%S.%f'
     return datetime.strptime(time, fmt)
+
+
+def timestamp_to_time(time: datetime) -> str:
+    # Same format as above
+    fmt = '%Y-%m-%dT%H:%M:%S.%f'
+    return time.strftime(fmt)
 
 
 def wkb_to_xy(wkb_input: str):

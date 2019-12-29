@@ -4,6 +4,7 @@ from typing import List
 from sqlalchemy.orm import joinedload
 
 from app.models import *
+from app.utils import timestamp_to_time
 
 Mapper = namedtuple('Mapper', 'table attr attr_name annotatable updateable')
 
@@ -36,7 +37,8 @@ def get_mapped_sessions(session_type: SessionType = None):
 
 
 def get_mapped_session_description(mapped_sessions: List[MappedSession]):
-    return [{'id': m.id} for m in mapped_sessions]
+    return [{'id': m.id, 'application_start': timestamp_to_time(m.start_application_time_stamp)}
+            for m in mapped_sessions]
 
 
 def create_annotation_entity(annotation_txt: str) -> Annotation:
