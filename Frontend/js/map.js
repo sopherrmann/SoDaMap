@@ -262,6 +262,19 @@ function end(e) {
     e.returnValue = '';
 }
 
+function get_index_of_first_symbol_layer() {
+    const layers = map.getStyle().layers;
+    // Find the index of the first symbol layer in the map style
+    let firstSymbolId;
+    for (let i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+        }
+    }
+    return firstSymbolId
+}
+
 /* Todo: if you want multiple pages instead of one for the questionnaire modals
 // Make the modals to multiple page insert
 let currentTab = 0; // Current tab is set to be the first tab (0)

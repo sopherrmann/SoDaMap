@@ -41,7 +41,7 @@ $("#exist-mapped-sessions").click(function(){
                     const elem = mapped_sessions[idx];
 
                     const html_elem = $('<a>id: ' + elem['id'] + '</a>');
-                    html_elem.click(function () {load_mapped_session(elem['id'])});
+                    html_elem.click(function () {load_mapped_session_layers(elem['id'])});
                     existing_dropdown.append(html_elem);
                 }
                 existing_dropdown.removeClass('invisible')
