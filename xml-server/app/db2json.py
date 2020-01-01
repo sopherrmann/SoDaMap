@@ -1,7 +1,7 @@
 from typing import List
 
 from app.models import Routing, TextWithSuggestion, MapSearch, UserPosition, MapInteraction, Question, SpatialBookmark
-from app.repository import get_entity_type
+from app.repository import get_entity_type, get_mapped_session_by_id
 from app.utils import wkb_to_xy
 
 
@@ -17,6 +17,14 @@ class ParseDbJson:
             'spatial_bookmark': self.get_spatial_bookmark,
         }
         return mapper[entity_type]
+
+    def get_mapped_session(self, mapped_session_id: int):
+        entity = get_mapped_session_by_id(mapped_session_id)
+        return {
+            'Id': entity.id,
+            'StartApplicationTimeStamp': entity.start_application_time_stamp,
+            'endApplicationTimeStamp': entity.end_application_time_stamp,
+        }
 
     def get_json_entity_from_db(self, mapped_session_id: int, entity_type: str):
         entities = get_entity_type(mapped_session_id, entity_type)

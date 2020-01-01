@@ -75,6 +75,11 @@ em {
     padding: 0 10px;
     float: inside;
 }
+/* Make Map smaller when right bar is added */
+.main-reduce-width {
+    margin-right: 300px;
+}
+
 /* The sidebar menu */
 .sidenav {
     height: 770px;
@@ -99,7 +104,7 @@ em {
     cursor: pointer;
 }
 /* Style the sidenav links and the dropdown button */
-.sidenav a, .dropdown-btn {
+.sidenav a, .dropdown-btn, .right-bar-header {
     padding: 6px 8px 6px 16px;
     text-decoration: none;
     font-size: 25px;
@@ -123,7 +128,7 @@ em {
     color: white;
     display: block;
 }
-.sidenav p:hover, .sidenav .dropdown-container a:hover {
+.sidenav p:hover, .sidenav .dropdown-container a:hover,  #right-dropdown a:hover, .button:hover{
     color: cornflowerblue;
     cursor: pointer;
 }
@@ -133,6 +138,11 @@ em {
     font-size: 18px;
     color: white;
     display: block;
+}
+
+.sidenav-elem-clicked {
+    background-color: cornflowerblue;
+    color: white;
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
@@ -320,4 +330,56 @@ input[type="radio"] {
 
 .invisible {
     display: none;
+}
+
+#right-bar-container {
+    padding-top: 10px;
+    position: relative;
+    bottom: 0;
+    right: 0;
+    width: 300px;  /* Same as map width is reduced */
+    height: 770px;  /* Same as sidenav */
+    background-color: #111;
+    float: right;
+    overflow: scroll;
+}
+
+#right-dropdown .right-dropdown-elem {
+    border-top: 1px solid white;
+    display: block;
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    padding: 6px 8px 6px 26px;
+}
+
+.smaller-text {
+    font-size: 14px;
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    float: right;
+}
+
+.button-div {
+    min-height: 30px;
+}
+
+.button {
+    padding: 3px;
+    color: white;
+    font-size: 14px;
+    border: 1px solid white;
+    margin-right: 3px;
+}
+.xml-button {
+    float: right;
+}
+.show-more-button {
+    float: right;
+    background-color: dimgray;
 }

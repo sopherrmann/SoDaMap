@@ -86,8 +86,19 @@ def route_mapped_session_handler(mapped_session_id: int):
     if request.method == 'PATCH':
         route_update_mapped_session(mapped_session_id)
     if request.method == 'GET':
-        xml = get_xml_from_db_id(mapped_session_id)
-        return Response(xml, mimetype='text/xml')
+        entity = ParseDbJson().get_mapped_session(mapped_session_id)
+        return jsonify({
+            'status': 200,
+            'mapped_session_id': mapped_session_id,
+            'entity_type': 'mapped_session',
+            'entity': entity
+        })
+
+
+@app.route('/mapped_sessions/<int:mapped_session_id>/xml', methods=['GET'])
+def route_get_xml(mapped_session_id: int):
+    xml = get_xml_from_db_id(mapped_session_id)
+    return Response(xml, mimetype='text/xml')
 
 
 def route_update_mapped_session(mapped_session_id: int):

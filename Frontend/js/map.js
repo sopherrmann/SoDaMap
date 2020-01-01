@@ -1,7 +1,9 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuaWJlaSIsImEiOiJjand1b2VzaDIxOWI2NGJwNXBmZDE1aGg3In0.FveFwontuW06ciBJV-FZng';
 let map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/mapbox/streets-v11', // stylesheet location
+    // stylesheet location  https://stackoverflow.com/questions/35248310/add-some-basic-markers-to-a-map-in-mapbox-via-mapbox-gl-js, 30.12.2019 13:30
+    // https://github.com/mapbox/mapbox-gl-styles
+    style: 'mapbox://styles/mapbox/basic-v8',
     center: [16.363449, 48.210033], // starting position [lng, lat]
     zoom: 9 // starting zoom
 });

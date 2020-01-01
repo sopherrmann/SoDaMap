@@ -37,13 +37,14 @@ function getLayerRequestData(properties) {
 }
 
 function loadMappedSessionLayers(mappedSessionId) {
-    console.log('mapped session loader ' + mappedSessionId);
+    console.log('Loading mapped session ' + mappedSessionId);
 
     let colorArray = getRandomColor();
     for (let layerName in geoserverLayers) {
         console.log(layerName);
         let layerDict = geoserverLayers[layerName];
 
+        let colorBoxId = $('#' + getRightBarId(mappedSessionId));
         if (!layerDict.removeFunc(layerName, mappedSessionId)) {
             $.ajax({
                 url: wfsUrl,
@@ -56,7 +57,7 @@ function loadMappedSessionLayers(mappedSessionId) {
                 }),
                 success: function (mapLayer) {
                     let curId = getCurId(layerName, mappedSessionId);
-                    console.log('Successfully retrieved layer' + curId + 'from GeoServer');
+                    console.log('Successfully retrieved layer ' + curId + ' from GeoServer');
 
                     let sourceId = getSourceId(layerName, mappedSessionId);
                     map.addSource(sourceId, {
@@ -64,11 +65,17 @@ function loadMappedSessionLayers(mappedSessionId) {
                         'data': mapLayer
                     });
                     layerDict.plotFunc(layerName, mappedSessionId, colorArray, layerDict.additional);
-                    console.log('Successfully added layer' + curId + 'to map')
+
+                    colorBoxId.removeClass('invisible');
+                    document.getElementById(getRightBarId(mappedSessionId)).style.backgroundColor = rgbToHex(colorArray);
+                    console.log('Successfully added layer ' + curId + ' to map');
                 }
             });
+        } else {
+            colorBoxId.addClass('invisible');
         }
     }
+    console.log('Finished layer loading')
 }
 
 function getCurId(layerName, mappedSessionId) {
@@ -200,6 +207,7 @@ function addGeoserverLayerClickEvent(e, popupContentFunc) {
         .setLngLat(e.lngLat)
         .setHTML(popupContentFunc(property))
         .addTo(map);
+    e.stopPropagation();
 }
 
 // Popups
@@ -226,9 +234,9 @@ function getLayerPopupContent(layerName, content) {
 // TODO maybe a list of matching color would be better then a random one
 function getRandomColor() {
     // Red, green, blue should be integers in the range of 0 - 255
-    const r = parseInt(Math.random() * 255);
-    const g = parseInt(Math.random() * 255);
-    const b = parseInt(Math.random() * 255);
+    const r = 128 + parseInt(Math.random() * 127);
+    const g = 128 + parseInt(Math.random() * 127);
+    const b = 128 + parseInt(Math.random() * 127);
 
     return [r, g, b]
 }
@@ -238,4 +246,17 @@ function buildRgba(colorArray, alpha) {
     let g = colorArray[1];
     let b = colorArray[2];
     return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+}
+
+// https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb, 01.01.2020, 22:30
+function componentToHex(c) {
+    let hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(rgb) {
+    let r = rgb[0];
+    let g = rgb[1];
+    let b = rgb[2];
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }

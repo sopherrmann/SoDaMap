@@ -37,7 +37,12 @@ def get_mapped_sessions(session_type: SessionType = None):
 
 
 def get_mapped_session_description(mapped_sessions: List[MappedSession]):
-    return [{'id': m.id, 'application_start': timestamp_to_time(m.start_application_time_stamp)}
+    return [
+    {
+        'id': m.id,
+        'application_start': timestamp_to_time(m.start_application_time_stamp),
+        'application_end': timestamp_to_time(m.end_application_time_stamp),
+     }
             for m in mapped_sessions]
 
 
