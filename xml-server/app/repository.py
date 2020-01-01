@@ -30,8 +30,8 @@ def get_updateable_entities():
 
 def get_mapped_sessions(session_type: SessionType = None):
     if session_type:
-        return db.session.query(MappedSession)\
-            .filter(MappedSession.session_type == session_type)\
+        return db.session.query(MappedSession) \
+            .filter(MappedSession.session_type == session_type) \
             .all()
     return db.session.query(MappedSession).all()
 
@@ -84,3 +84,10 @@ def update_mapped_session(mapped_session_id: int, mapped_session: MappedSession)
     db.session.add(mapped_session)
     db.session.commit()
     return mapped_session
+
+
+def get_entity_type(mapped_session_id: int, entity_type: str):
+    assert entity_type in TABLE_MAPPING
+
+    entity_mapper = TABLE_MAPPING[entity_type]
+    return db.session.query(entity_mapper.table).filter_by(mapped_session_id=mapped_session_id).all()

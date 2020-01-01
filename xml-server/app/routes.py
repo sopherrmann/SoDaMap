@@ -5,6 +5,7 @@ from app.obj2db import get_db_from_xml, get_xml_from_db_id
 from app.repository import *
 from app.utils import time_to_timestamp, apply_to_entity
 from app.models import SessionType
+from app.db2json import ParseDbJson
 
 
 @app.route('/mapped_sessions', methods=['GET'])
@@ -81,28 +82,32 @@ def route_create_new_mapped_session():
 
 
 @app.route('/mapped_sessions/<int:mapped_session_id>', methods=['PATCH', 'GET'])
-def route_update_mapped_session(mapped_session_id: int):
+def route_mapped_session_handler(mapped_session_id: int):
     if request.method == 'PATCH':
-        # Currently end time is only value which can be updated
-        end_time = time_to_timestamp(request.json['end_time'])
-        to_update = get_mapped_session_by_id(mapped_session_id)
-
-        if not to_update:
-            return forge_error_404()
-
-        to_update.end_application_time_stamp = end_time
-        update_mapped_session(mapped_session_id, to_update)
-
-        return jsonify({
-            "status": 200,
-            "web_session_id": mapped_session_id,
-        })
+        route_update_mapped_session(mapped_session_id)
     if request.method == 'GET':
         xml = get_xml_from_db_id(mapped_session_id)
         return Response(xml, mimetype='text/xml')
 
 
-@app.route('/mapped_sessions/entity_types', methods=['GET'])
+def route_update_mapped_session(mapped_session_id: int):
+    # Currently end time is only value which can be updated
+    end_time = time_to_timestamp(request.json['end_time'])
+    to_update = get_mapped_session_by_id(mapped_session_id)
+
+    if not to_update:
+        return forge_error_404()
+
+    to_update.end_application_time_stamp = end_time
+    update_mapped_session(mapped_session_id, to_update)
+
+    return jsonify({
+        "status": 200,
+        "web_session_id": mapped_session_id,
+    })
+
+
+@app.route('/mapped_sessions/updateable_entity_types', methods=['GET'])
 def route_get_entity_types_to_update():
     entities = get_updateable_entities()
     return jsonify({
@@ -111,7 +116,27 @@ def route_get_entity_types_to_update():
     })
 
 
-@app.route('/mapped_sessions/<int:mapped_session_id>/<string:entity_type>', methods=['POST'])
+@app.route('/mapped_sessions/<int:mapped_session_id>/<string:entity_type>', methods=['GET', 'POST'])
+def route_entity_types_handler(mapped_session_id: int, entity_type: str):
+    if request.method == 'POST':
+        return route_write_log(mapped_session_id, entity_type)
+    if request.method == 'GET':
+        return route_get_entity(mapped_session_id, entity_type)
+
+
+def route_get_entity(mapped_session_id: int, entity_type: str):
+    if entity_type not in TABLE_MAPPING:
+        return forge_error(400, f'unknown type {entity_type}')
+
+    entities = ParseDbJson().get_json_entity_from_db(mapped_session_id, entity_type)
+    return jsonify({
+        "status": 200,
+        "mapped_session_id": mapped_session_id,
+        "entity_type": entity_type,
+        'entity': entities,
+    })
+
+
 def route_write_log(mapped_session_id: int, entity_type: str):
     if entity_type not in get_updateable_entities():
         return forge_error(400, f'Unknown type {entity_type}')
@@ -129,7 +154,6 @@ def route_write_log(mapped_session_id: int, entity_type: str):
         return forge_error(400, str(e))
 
     complete_entity = getattr(mapped_session, entity_mapper.attr_name)
-    # assumed that all entities will be a list in the future > TODO check
     if isinstance(complete_entity, list):
         complete_entity.append(entity)
     else:
