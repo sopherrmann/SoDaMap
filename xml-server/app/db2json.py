@@ -1,7 +1,7 @@
 from typing import List
 
-from app.models import Routing, TextWithSuggestion, MapSearch, UserPosition, MapInteraction, Question, SpatialBookmark
-from app.repository import get_entities_by_type, get_mapped_session_by_id
+from app.models import Routing, TextWithSuggestion, MapSearch, UserPosition, MapInteraction, Question, SpatialBookmark, MappedSession
+from app.repository import get_entities_by_type, get_mapped_session_by_id, get_mapped_session_by_id_eager
 from app.utils import wkb_to_xy
 
 
@@ -9,6 +9,7 @@ class ParseDbJson:
 
     def get_func_from_entity_type(self, entity_type):
         mapper = {
+            'mapped_session': self.get_mapped_session,
             'user_position': self.get_user_position,
             'map_interaction': self.get_map_interaction,
             'map_search': self.get_map_search,
@@ -18,17 +19,19 @@ class ParseDbJson:
         }
         return mapper[entity_type]
 
-    def get_mapped_session(self, mapped_session_id: int):
-        entity = get_mapped_session_by_id(mapped_session_id)
-        return {
+    def get_mapped_session(self, entity: MappedSession) -> List[dict]:
+        return [{
             'Id': entity.id,
             'StartApplicationTimeStamp': entity.start_application_time_stamp,
-            'endApplicationTimeStamp': entity.end_application_time_stamp,
+            'EndApplicationTimeStamp': entity.end_application_time_stamp,
             'Annotation': self._get_annotation_list(entity),
-        }
+        }]
 
     def get_json_entity_from_db(self, mapped_session_id: int, entity_type: str):
-        entities = get_entities_by_type(mapped_session_id, entity_type)
+        if entity_type == 'mapped_session':
+            entities = get_mapped_session_by_id_eager(mapped_session_id, MappedSession.annotation)
+        else:
+            entities = get_entities_by_type(mapped_session_id, entity_type)
         entity_mapper_func = self.get_func_from_entity_type(entity_type)
         return entity_mapper_func(entities)
 

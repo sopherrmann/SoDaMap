@@ -1,4 +1,5 @@
 const entityMapper = {
+    'mapped_session': {'title': 'Mapped Session', 'dashed': 'mapped-session'},
     'user_position': {'title': 'User Position', 'dashed': 'user-position'},
     'spatial_bookmark': {'title': 'Spatial Bookmark', 'dashed': 'spatial-bookmark'},
     'map_interaction': {'title': 'Map Interaction', 'dashed': 'map-interaction'},
@@ -13,14 +14,6 @@ function showMore(mappedSessionId) {
 
     let title = document.getElementById('more-info-title');
     title.innerHTML = 'Mapped Session ' + mappedSessionId;
-
-    let showMoreHeader = $('#show-more-header');
-    if (showMoreHeader.find('.annotation').length === 0) {
-        let mappedSessionAnnotation = getAnnotationInput('mapped_session', mappedSessionId);
-        showMoreHeader.append(mappedSessionAnnotation);
-        addAnnotationButtonClickHandler('mapped_session', mappedSessionId);
-    }
-    // TODO add click handler!
 
     let body = document.getElementById('more-info-body');
     body.innerHTML = getShowMoreHtml();
