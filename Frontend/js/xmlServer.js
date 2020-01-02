@@ -12,15 +12,19 @@ const annotationUrl = xmlServerURL + "annotation";
 const annotationEntitiesURL = annotationUrl + "/entity_types";
 
 // Dynamic server urls
-function get_mapped_session_url_by_id(mapped_session_id) {
-    return mappedSessionUrl + "/" + mapped_session_id
+function getMappedSessionUrlById(mapped_session_id) {
+    return mappedSessionUrl + "/" + mapped_session_id;
 }
 
-function get_mapped_session_url_add_entity(mapped_session_id, entity_type) {
-    return mappedSessionUrl + "/" + mapped_session_id + "/" + entity_type
+function getMappedSessionUrlAddEntity(mapped_session_id, entity_type) {
+    return getMappedSessionUrlById(mapped_session_id) + "/" + entity_type;
 }
 
-function get_add_annotation_url(entity_type, entity_id) {
+function getMappedSessionXML(mappedSessionId) {
+    return getMappedSessionUrlById(mappedSessionId) + "/xml";
+}
+
+function getAddAnnotationUrl(entity_type, entity_id) {
     return xmlServerURL + "/annotation/" + entity_type + "/" + entity_id;
 }
 
@@ -69,7 +73,7 @@ function getRightDropDownButtons(mappedSessionId) {
     show_more_button.click(function () {});
 
     let xml_button = $('<span class="xml-button button">Get XML</span>');
-    xml_button.click(getXML());
+    xml_button.click(function () {getXML(mappedSessionId)});
 
     let button = $('<div class="button-div"></div>');
     button.append(show_more_button);
@@ -77,7 +81,31 @@ function getRightDropDownButtons(mappedSessionId) {
     return button;
 }
 
-function getXML() {
+function getXML(mappedSessionId) {
+    console.log('Loading XML');
+    $.ajax({
+        url: getMappedSessionXML(mappedSessionId),
+        type: 'GET',
+        dataType: 'xml',
+        success: function (result) {
+            console.log('Retrieved XML ' +  mappedSessionId + ' from server');
+
+            let xml = result.children[0].outerHTML;
+            let blob = new Blob([xml], {type: 'text/xml'});
+
+            const url = window.URL.createObjectURL(blob);
+            const html_elem = document.createElement('mapped_session_xml_download');
+            html_elem.style.display = 'none';
+            html_elem.href = url;
+            html_elem.download = 'mapped_session_' + mappedSessionId + '.xml';
+            document.body.appendChild(html_elem);
+            html_elem.click();
+            window.URL.revokeObjectURL(url);
+
+            console.log('Downloaded ' + mappedSessionId + ' xml');
+        }
+    });
+
     return 'the xml';
 }
 

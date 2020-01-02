@@ -18,6 +18,7 @@
    <!--Routing-->
    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.0.2/mapbox-gl-directions.js'></script>
    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.0.2/mapbox-gl-directions.css' type='text/css' />
+
 </head>
 
 <body>
@@ -28,7 +29,7 @@
 
 <!-- Questionnaire about personal info -->
 <!-- Todo: Save the infos and don't show it again... But only if it isn't to much -->
-<div id="personalInfo" class="input">
+<!--<div id="personalInfo" class="input">
 	<div class="input-content">
 		<div class="input-header">
 			<span class="close">&times;</span>
@@ -80,7 +81,7 @@
 			<input type="submit" id="submitUploadPerson" value="Enter" name="submit" onclick="close()"/>
 		</div>
 	</div>
-</div>
+</div>-->
 
 <!-- Side navigation -->
 <div class="sidenav">
@@ -88,8 +89,6 @@
 	<a id="routing">Route</a>
 	<a id="upload">Upload</a>
 	<a class="dropdown-btn" id="exist-mapped-sessions">Existing</a>
-	<div class="dropdown-container invisible" id="existing-dropdown">
-	</div>
     <a id="addInfo">Add Info</a>
 	<a id="diary">Diary Study</a>
 </div>
@@ -110,6 +109,7 @@
 		</div>
 	</div>
 </div>
+
 <!-- After pressing submit open a questionnaire -->
 <div id="uploadQuest" class="input">
 	<div class="input-content">
