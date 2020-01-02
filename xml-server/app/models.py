@@ -28,7 +28,7 @@ class MappedSession(db.Model):
     questions = db.relationship('Question', back_populates='mapped_session', cascade='all, delete-orphan')
     spatial_bookmarks = db.relationship('SpatialBookmark', back_populates='mapped_session',
                                         cascade='all, delete-orphan')
-    annotations = db.relationship('Annotation')
+    annotation = db.relationship('Annotation')
 
 
 class UserPosition(db.Model):

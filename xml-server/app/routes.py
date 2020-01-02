@@ -57,7 +57,7 @@ def route_get_annotatable_entities():
 
 @app.route('/annotation/<string:entity_type>/<int:entity_id>', methods=['POST'])
 def route_annotation(entity_type: str, entity_id: int):
-    cur_annotation = request.json['annotation']
+    cur_annotation = request.data.decode()
 
     if entity_type not in get_annotable_entities():
         return forge_error(400, f'Entity of type {entity_type} can not be annotated.')

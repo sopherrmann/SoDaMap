@@ -53,7 +53,7 @@ def create_annotation_entity(annotation_txt: str) -> Annotation:
 def insert_annotation(entity: str, entity_id: int, annotation: Annotation):
     entity_table = TABLE_MAPPING[entity].table
     entity_session = db.session.query(entity_table).filter(entity_table.id == entity_id).one()
-    entity_session.annotations.append(annotation)
+    entity_session.annotation.append(annotation)
     db.session.commit()
 
 
