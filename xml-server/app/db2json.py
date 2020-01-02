@@ -32,12 +32,17 @@ class ParseDbJson:
         return entity_mapper_func(entities)
 
     def get_user_position(self, entities: List[UserPosition]) -> List[dict]:
-        return [self._get_geo_coord_with_time_from_obj(entity) for entity in entities]
+        return [{
+            'Id': entity.id,
+            'GeoCoordinateWithTimeStamp': self._get_geo_coord_with_time_from_obj(entity),
+        }
+            for entity in entities]
 
     def get_map_interaction(self, entities: List[MapInteraction]) -> List[dict]:
         map_interaction = []
         for entity in entities:
             d = {
+                'Id': entity.id,
                 'UserPositionWithTimeStamp': self._get_geo_coord_with_time_from_obj(entity),
                 'ClickInteraction': None,
                 'PanInteraction': None,
@@ -83,14 +88,16 @@ class ParseDbJson:
     def get_question(self, entities: List[Question]) -> List[dict]:
         return [
             {
-                'question': entity.question,
-                'answer': entity.answer,
+                'Id': entity.id,
+                'Question': entity.question,
+                'Answer': entity.answer,
             }
             for entity in entities]
 
     def get_spatial_bookmark(self, entities: List[SpatialBookmark]) -> List[dict]:
         return [
             {
+                'Id': entity.id,
                 'UserPositionWithTimeStamp': self._get_geo_coord_with_time_from_obj(entity),
                 'Notes': entity.notes
             }
@@ -99,7 +106,8 @@ class ParseDbJson:
 
     def get_routing(self, entities: List[Routing]):
         entity = entities[0]
-        return {
+        return [{
+            'Id': entity.id,
             'StartRoutingInterfaceTimeStamp': entity.start_routing_interface_time_stamp,
             'EndRoutingInterfaceSendRequestOrInterfaceClosedTimeStamp': entity.end_routing_interface_send_request_or_interface_closed_time_sta,
             'OriginTextBoxHistory': [self._get_text_with_suggestions(tws)
@@ -108,12 +116,13 @@ class ParseDbJson:
                                           for tws in entity.destination_text_box_history.text_with_suggestion],
             'StartRoutingTimeStamp': entity.start_routing_time_stamp,
             'EndRoutingTimeStamp': entity.end_routing_time_stamp
-        }
+        }]
 
     def get_map_search(self, entities: List[MapSearch]) -> List[dict]:
         map_search = []
         for entity in entities:
             d = {
+                'Id': entity.id,
                 'StarttimeStamp': entity.starttime_stamp,
                 'EndtimeStamp': entity.endtime_stamp,
                 'textWithSuggestions': [self._get_text_with_suggestions(tws) for tws in entity.text_with_suggestion]
