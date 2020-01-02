@@ -6,17 +6,17 @@ from sqlalchemy.orm import joinedload
 from app.models import *
 from app.utils import timestamp_to_time
 
-Mapper = namedtuple('Mapper', 'table attr attr_name annotatable updateable')
+Mapper = namedtuple('Mapper', 'table attr attr_name annotatable annotation_attr updateable')
 
 # Map entity type to table
 TABLE_MAPPING = {
-    'mapped_session': Mapper(MappedSession, MappedSession, 'mapped_session', True, False),
-    'user_position': Mapper(UserPosition, MappedSession.user_positions, 'user_positions', True, True),
-    'map_interaction': Mapper(MapInteraction, MappedSession.map_interactions, 'map_interactions', True, True),
-    'map_search': Mapper(MapSearch, MappedSession.map_searches, 'map_searches', True, True),
-    'routing': Mapper(Routing, MappedSession.routing, 'routing', True, True),
-    'spatial_bookmark': Mapper(SpatialBookmark, MappedSession.spatial_bookmarks, 'spatial_bookmarks', True, True),
-    'question': Mapper(Question, MappedSession.questions, 'questions', False, True),
+    'mapped_session': Mapper(MappedSession, MappedSession, 'mapped_session', True, MappedSession.annotation, False),
+    'user_position': Mapper(UserPosition, MappedSession.user_positions, 'user_positions', True, UserPosition.annotation, True),
+    'map_interaction': Mapper(MapInteraction, MappedSession.map_interactions, 'map_interactions', True, MapInteraction.annotation, True),
+    'map_search': Mapper(MapSearch, MappedSession.map_searches, 'map_searches', True, MapSearch.annotation, True),
+    'routing': Mapper(Routing, MappedSession.routing, 'routing', True, Routing.annotation, True),
+    'spatial_bookmark': Mapper(SpatialBookmark, MappedSession.spatial_bookmarks, 'spatial_bookmarks', True, SpatialBookmark.annotation, True),
+    'question': Mapper(Question, MappedSession.questions, 'questions', False, None, True),
 }
 
 
@@ -91,8 +91,11 @@ def update_mapped_session(mapped_session_id: int, mapped_session: MappedSession)
     return mapped_session
 
 
-def get_entity_type(mapped_session_id: int, entity_type: str):
+def get_entities_by_type(mapped_session_id: int, entity_type: str):
     assert entity_type in TABLE_MAPPING
 
     entity_mapper = TABLE_MAPPING[entity_type]
-    return db.session.query(entity_mapper.table).filter_by(mapped_session_id=mapped_session_id).all()
+    qry = db.session.query(entity_mapper.table).filter_by(mapped_session_id=mapped_session_id)
+    if entity_mapper.annotatable:
+        qry = qry.options(joinedload(entity_mapper.annotation_attr))
+    return qry.all()

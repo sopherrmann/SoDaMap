@@ -1,7 +1,7 @@
 from typing import List
 
 from app.models import Routing, TextWithSuggestion, MapSearch, UserPosition, MapInteraction, Question, SpatialBookmark
-from app.repository import get_entity_type, get_mapped_session_by_id
+from app.repository import get_entities_by_type, get_mapped_session_by_id
 from app.utils import wkb_to_xy
 
 
@@ -24,10 +24,11 @@ class ParseDbJson:
             'Id': entity.id,
             'StartApplicationTimeStamp': entity.start_application_time_stamp,
             'endApplicationTimeStamp': entity.end_application_time_stamp,
+            'Annotation': self._get_annotation_list(entity),
         }
 
     def get_json_entity_from_db(self, mapped_session_id: int, entity_type: str):
-        entities = get_entity_type(mapped_session_id, entity_type)
+        entities = get_entities_by_type(mapped_session_id, entity_type)
         entity_mapper_func = self.get_func_from_entity_type(entity_type)
         return entity_mapper_func(entities)
 
@@ -35,6 +36,7 @@ class ParseDbJson:
         return [{
             'Id': entity.id,
             'GeoCoordinateWithTimeStamp': self._get_geo_coord_with_time_from_obj(entity),
+            'Annotation': self._get_annotation_list(entity),
         }
             for entity in entities]
 
@@ -48,6 +50,7 @@ class ParseDbJson:
                 'PanInteraction': None,
                 'ZoomInInteraction': None,
                 'ZoomOutInteraction': None,
+                'Annotation': self._get_annotation_list(entity),
             }
             if entity.is_click_interaction:
                 d['ClickInteraction'] = self._get_click_interaction(entity)
@@ -99,7 +102,8 @@ class ParseDbJson:
             {
                 'Id': entity.id,
                 'UserPositionWithTimeStamp': self._get_geo_coord_with_time_from_obj(entity),
-                'Notes': entity.notes
+                'Notes': entity.notes,
+                'Annotation': self._get_annotation_list(entity),
             }
             for entity in entities
         ]
@@ -115,7 +119,8 @@ class ParseDbJson:
             'DestiantionTextBoxHistory': [self._get_text_with_suggestions(tws)
                                           for tws in entity.destination_text_box_history.text_with_suggestion],
             'StartRoutingTimeStamp': entity.start_routing_time_stamp,
-            'EndRoutingTimeStamp': entity.end_routing_time_stamp
+            'EndRoutingTimeStamp': entity.end_routing_time_stamp,
+            'Annotation': self._get_annotation_list(entity),
         }]
 
     def get_map_search(self, entities: List[MapSearch]) -> List[dict]:
@@ -125,7 +130,8 @@ class ParseDbJson:
                 'Id': entity.id,
                 'StarttimeStamp': entity.starttime_stamp,
                 'EndtimeStamp': entity.endtime_stamp,
-                'textWithSuggestions': [self._get_text_with_suggestions(tws) for tws in entity.text_with_suggestion]
+                'textWithSuggestions': [self._get_text_with_suggestions(tws) for tws in entity.text_with_suggestion],
+                'Annotation': self._get_annotation_list(entity),
             }
             if entity.bbox_geom is not None:
                 d['BBox'] = self._get_bbox(entity.bbox_geom, entity.bbox_time_stamp_lr, entity.bbox_time_stamp_ul)
@@ -156,3 +162,6 @@ class ParseDbJson:
     def _get_geo_coord_with_time_from_obj(self, obj):
         x, y = wkb_to_xy(obj.geom)
         return self._get_geo_coord_with_time(x, y, obj.time_stamp)
+
+    def _get_annotation_list(self, entity):
+        return [e.annotation for e in entity.annotation]
