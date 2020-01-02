@@ -171,25 +171,6 @@ function showUploadDialog() {
     upload.style.display = "block";
 }
 
-//* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content
-// This allows the user to have multiple dropdowns without any conflict */
-const dropdown = document.getElementsByClassName("dropdown-btn");
-let i;
-for (i = 0; i < dropdown.length; i++) {
-    dropdown[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        let dropdownContent = this.nextElementSibling;
-        if (dropdownContent.style.display === "block") {
-            dropdownContent.style.display = "none";
-            document.getElementById("exist").style.backgroundColor = "";
-            document.getElementById("exist").style.color = "";
-        } else {
-            dropdownContent.style.display = "block";
-            document.getElementById("exist").style.backgroundColor = "cornflowerblue";
-            document.getElementById("exist").style.color = "white";
-        }
-    });
-}
 
 // Add information to the uploaded XML-files
 const add_info = document.getElementById("myAppInfo");
@@ -219,12 +200,15 @@ function open() {
     }
 }
 
+const moreInfo = document.getElementById('more-info');
+
 // Close input window
 document.getElementsByClassName("close")[0].addEventListener('click', close);
 document.getElementsByClassName("close")[1].addEventListener('click', close);
 document.getElementsByClassName("close")[2].addEventListener('click', close);
 document.getElementsByClassName("close")[3].addEventListener('click', close);
 document.getElementsByClassName("close")[4].addEventListener('click', close);
+// document.getElementsByClassName("close")[4].addEventListener('click', close);
 function close(){
     if (value_rout === 1) {
         document.getElementById("routing").style.backgroundColor = "cornflowerblue";
@@ -240,6 +224,7 @@ function close(){
     add_info.style.display = "none";
     startinfo.style.display = "none";
     uploadQuest.style.display = "none";
+    moreInfo.style.display = "none";
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {

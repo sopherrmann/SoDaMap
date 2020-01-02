@@ -1,5 +1,5 @@
 // Static server urls
-const xmlServerURL = "http://0.0.0.0:5000";
+const xmlServerURL = "http://localhost:5000";
 
 const mappedSessionUrl = xmlServerURL + "/mapped_sessions";
 const mappedUrl = mappedSessionUrl + "/mapped";
@@ -12,20 +12,20 @@ const annotationUrl = xmlServerURL + "annotation";
 const annotationEntitiesURL = annotationUrl + "/entity_types";
 
 // Dynamic server urls
-function getMappedSessionUrlById(mapped_session_id) {
-    return mappedSessionUrl + "/" + mapped_session_id;
+function getMappedSessionUrlById(mappedSessionId) {
+    return mappedSessionUrl + "/" + mappedSessionId;
 }
 
-function getMappedSessionUrlAddEntity(mapped_session_id, entity_type) {
-    return getMappedSessionUrlById(mapped_session_id) + "/" + entity_type;
+function getMappedSessionUrlWithEntity(mappedSessionId, entityType) {
+    return getMappedSessionUrlById(mappedSessionId) + "/" + entityType;
 }
 
 function getMappedSessionXML(mappedSessionId) {
     return getMappedSessionUrlById(mappedSessionId) + "/xml";
 }
 
-function getAddAnnotationUrl(entity_type, entity_id) {
-    return xmlServerURL + "/annotation/" + entity_type + "/" + entity_id;
+    function getAddAnnotationUrl(entityType, entityId) {
+    return xmlServerURL + "/annotation/" + entityType + "/" + entityId;
 }
 
 
@@ -63,14 +63,14 @@ function getRightDropdownLink(elem) {
         '<div class="color-box invisible" id="' + rgbId + '"></div></div>' +
         '<div class="smaller-text"> Start: ' + elem['application_start'] + '</div>' +
         '<div class="smaller-text"> End: ' + elem['application_end'] + '</div></a>');
-    html_elem.click(function () {loadMappedSession(elem['id'])});
+    html_elem.click(function () {loadMappedSessionLayers(elem['id'])});
 
     return html_elem;
 }
 
 function getRightDropDownButtons(mappedSessionId) {
     let show_more_button = $('<span class="show-more-button button">Show More</span>');
-    show_more_button.click(function () {});
+    show_more_button.click(function () {showMore(mappedSessionId)});
 
     let xml_button = $('<span class="xml-button button">Get XML</span>');
     xml_button.click(function () {getXML(mappedSessionId)});
@@ -105,8 +105,6 @@ function getXML(mappedSessionId) {
             console.log('Downloaded ' + mappedSessionId + ' xml');
         }
     });
-
-    return 'the xml';
 }
 
 function setListOfMappedSessions(dropdown) {
@@ -140,20 +138,6 @@ $('#submitUpload').click(function () {
     })
 });
 
-function loadMappedSession(mappedSessionId) {
-    loadMappedSessionLayers(mappedSessionId);
-    loadMappedSessionInfo(mappedSessionId);
-}
-
 function getRightBarId(mapped_session_id) {
     return 'right_bar_' + mapped_session_id;
-}
-
-function loadMappedSessionInfo(mappedSessionId) {
-    console.log('Loading Mapped Session Info');
-
-    let rightBarId = getRightBarId(mappedSessionId);
-    const right_html_tag = $('<a id="' + rightBarId + '">' + mappedSessionId + '</a>');
-    $('#right-dropdown').append(right_html_tag);
-    console.log('Added ' + mappedSessionId + ' to right bar ');
 }

@@ -278,7 +278,7 @@ input[type="radio"] {
 .input {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    z-index: 10; /* Sit on top */
     padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
@@ -367,6 +367,7 @@ input[type="radio"] {
 
 .button-div {
     min-height: 30px;
+    margin: 9px 0 3px;
 }
 
 .button {
@@ -376,10 +377,55 @@ input[type="radio"] {
     border: 1px solid white;
     margin-right: 3px;
 }
+.button:hover {
+    color: gray;
+    background-color: white;
+    border: 1px solid gray;
+}
+
 .xml-button {
     float: right;
 }
 .show-more-button {
     float: right;
     background-color: dimgray;
+}
+
+#more-info {
+    max-height: 770px;
+}
+
+#mapped-session-annotate {
+    float: right;
+    margin: 7px 20px;
+    padding: 3px 7px;
+    font-size: 28px;
+    background-color: gray;
+}
+
+.entity-header {
+    font-size: 20px;
+    background-color: gray;
+    color: white;
+    padding: 6px 8px 6px 6px;
+}
+
+.string { color: darkblue; }
+.number { color: darkgreen; }
+.boolean { color: darkmagenta; }
+.null { color: darkslateblue; }
+.key { color: darkred; }
+
+.single-entity {
+    border-bottom: 1px solid gray;
+    /*max-width: 400px;*/
+}
+
+.annotation {
+    max-width: 200px;
+    display: inline-flex;
+}
+.annotation-name {
+    padding: 10px;
+    font-size: 16px;
 }
