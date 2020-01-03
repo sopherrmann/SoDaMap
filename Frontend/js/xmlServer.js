@@ -24,7 +24,7 @@ function getMappedSessionXML(mappedSessionId) {
     return getMappedSessionUrlById(mappedSessionId) + "/xml";
 }
 
-    function getAddAnnotationUrl(entityType, entityId) {
+function getAddAnnotationUrl(entityType, entityId) {
     return xmlServerURL + "/annotation/" + entityType + "/" + entityId;
 }
 

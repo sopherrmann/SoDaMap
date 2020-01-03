@@ -34,11 +34,15 @@ function getShowMoreHtml() {
 
 function fillShowMoreElems(mappedSessionId) {
     for (let entityType in entityMapper) {
-        addEntityFromServer(mappedSessionId, entityType, entityMapper[entityType])
+        addEntityFromServer(mappedSessionId, entityType, entityMapper[entityType], true)
     }
 }
 
-function addEntityFromServer(mappedSessionId, entityType, entityDict) {
+function reloadShowMoreElem(mappedSessionId, entityType, entityDict) {
+    addEntityFromServer(mappedSessionId, entityType, entityDict, false)
+}
+
+function addEntityFromServer(mappedSessionId, entityType, entityDict, createNew) {
     console.log('Loading mappedSession ' + mappedSessionId + ' entityType ' + entityType);
     $.ajax({
         url: getMappedSessionUrlWithEntity(mappedSessionId, entityType),
@@ -46,26 +50,33 @@ function addEntityFromServer(mappedSessionId, entityType, entityDict) {
         dataType: 'json',
         success: function (result) {
             console.log('Retrieved mappedSession ' + mappedSessionId + ' ' + entityType + ' from server');
-            let htmlParent = $('#' + getShowMoreParentId(entityDict.dashed));
-            htmlParent.empty();
-
             let htmlSingleEntityId = getSingleEntityBodyId(entityType);
-            let htmlElemHeader = '<div class="entity-header">' + entityDict.title + '</div>';
-            let htmlElem = '<div id="' + htmlSingleEntityId + '" class="entity-body"></div>';
-            htmlParent.append(htmlElemHeader + htmlElem);
-            let htmlElems = $('#' + htmlSingleEntityId);
 
-            // entity has to be always a list > fix routing
+            if (createNew) {
+                let htmlParent = $('#' + getShowMoreParentId(entityDict.dashed));
+                htmlParent.empty();
+                let htmlElemHeader = '<div class="entity-header">' + entityDict.title + '</div>';
+                let htmlElem = '<div id="' + htmlSingleEntityId + '" class="entity-body"></div>';
+                htmlParent.append(htmlElemHeader + htmlElem);
+            }
+
+            let htmlElems = $('#' + htmlSingleEntityId);
             let entities = result.entity;
+            // entity has to be always a list > fix routing
             for (let idx in entities) {
                 let entity = entities[idx];
                 let entityPretty = syntaxHighlight(JSON.stringify(entity, null, "\t"));
 
-                // Annotation
-                let htmlAnnotation = getAnnotationInput(entityType, entity.Id);
-                let elem = '<div class="single-entity">' + entityPretty + htmlAnnotation + '</div>';
-                htmlElems.append(elem);
-                addAnnotationButtonClickHandler(entityType, entity.Id)
+                let singleEntityId = getEntityJsonId(entityType, entity.Id);
+                if (createNew) {
+                    let entityHtml = '<div id="' + singleEntityId + '">' + entityPretty + '</div>';
+                    let htmlAnnotation = getAnnotationInput(entityType, entity.Id);
+                    let elem = '<div class="single-entity">' + entityHtml + htmlAnnotation + '</div>';
+                    htmlElems.append(elem);
+                    addAnnotationButtonClickHandler(mappedSessionId, entityType, entity.Id)
+                } else {
+                    document.getElementById(singleEntityId).innerHTML = entityPretty;
+                }
             }
         }
     });
@@ -89,6 +100,11 @@ function getAnnotationContentId(entityType, entityId) {
     return 'annotation-' + entityName + '-content-' + entityId;
 }
 
+function getEntityJsonId(entityType, entityId) {
+    let entityName = entityType.replace('_', '-');
+    return 'single-entity-' + entityName + '-' + entityId;
+}
+
 function getAnnotationInput(entityType, entityId) {
     let htmlAnnotationButtonId = getAnnotationButtonId(entityType, entityId);
     let htmlAnnotationContentId = getAnnotationContentId(entityType, entityId);
@@ -100,12 +116,12 @@ function getAnnotationInput(entityType, entityId) {
         '</div>';
 }
 
-function addAnnotationButtonClickHandler(entityType, entityId) {
+function addAnnotationButtonClickHandler(mappedSessionId, entityType, entityId) {
     let htmlAnnotationButtonId = getAnnotationButtonId(entityType, entityId);
-    $('#' + htmlAnnotationButtonId).click(function () {addAnnotationToServer(entityType, entityId)});
+    $('#' + htmlAnnotationButtonId).click(function () {addAnnotationToServer(mappedSessionId, entityType, entityId)});
 }
 
-function addAnnotationToServer(entityType, entityId) {
+function addAnnotationToServer(mappedSessionId, entityType, entityId) {
     let annotationContentId = getAnnotationContentId(entityType, entityId);
     let annotationText = document.getElementById(annotationContentId).value;
 
@@ -122,8 +138,8 @@ function addAnnotationToServer(entityType, entityId) {
         contentType: 'application/json',
         success: function () {
             document.getElementById(annotationContentId).value = '';
+            reloadShowMoreElem(mappedSessionId, entityType, entityMapper[entityType]);
             console.log('Added annotation ' + annotationText + ' ' + entityType  + ' ' + entityId);
-            alert('Annotation added!');
         }
     })
 }
