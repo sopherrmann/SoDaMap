@@ -5,23 +5,33 @@ const geoserverLayers = {
     // TODO set layer index > currently not possible https://github.com/mapbox/mapbox-gl-js/issues/7016, 03.01.2020, 22:20
     // https://labs.mapbox.com/maki-icons/, 09.01.2020, 10:40
     'map_search': {
-        'removeFunc': removeOnlyPolygon,
+        'removeFunc': removeSingleLayer,
         'plotFunc': plotMapSearchSource,
         'additional': {'popupContentFunc': getMapSearchPopup}},
     'spatial_bookmark': {
-        'removeFunc': removeOnlyPoint,
-        'plotFunc': plotOnlyPointSource,
+        'removeFunc': removeLayerWithBackground,
+        'plotFunc': plotPointSource,
         'additional': {'iconName': 'star-15', 'popupContentFunc': getSpatialBookmarkPopup}},
     'user_position': {
-        'removeFunc': removeOnlyPoint,
-        'plotFunc': plotOnlyPointSource,
+        'removeFunc': removeLayerWithBackground,
+        'plotFunc': plotPointSource,
         'additional': {'iconName': 'marker-15', 'popupContentFunc': getUserPositionPopup}},
 };
 const mapInteractionLayers = {
+    'new_bbox': {
+        'plotFunc': plotNewBbox,
+        'removeFunc': removeLayerWithBackground,
+        'additional': {'popupContentFunc': getMapInteractionPopup},
+    },
+    'old_bbox': {
+        'plotFunc': plotOldBbox,
+        'removeFunc': removeLayerWithBackground,
+        'additional': {'popupContentFunc': getMapInteractionPopup},
+    },
     'where_clicked': {
-        'removeFunc': removeOnlyPoint,
-        'plotFunc': plotOnlyPointSource,
-        'additional': {'iconName': 'circle-11'},
+        'removeFunc': removeLayerWithBackground,
+        'plotFunc': plotPointSource,
+        'additional': {'iconName': 'circle-11', 'popupContentFunc': getMapInteractionPopup},
     }};
 
 function getLayerRequestData(properties) {
@@ -78,9 +88,9 @@ function loadMappedSessionLayers(mappedSessionId) {
                     // Styling
                     colorBoxId.removeClass('invisible');
                     miButtonId.removeClass('invisible');
-                    colorBoxId = document.getElementById(getColorBoxId(mappedSessionId));
-                    colorBoxId.style.backgroundColor = rgbToHex(colorArray);
-                    colorBoxId.style.borderColor = rgbToHex(colorArray);
+                    let colorBoxIdDoc = document.getElementById(getColorBoxId(mappedSessionId));
+                    colorBoxIdDoc.style.backgroundColor = rgbToHex(colorArray);
+                    colorBoxIdDoc.style.borderColor = rgbToHex(colorArray);
                     document.getElementById(getMiButtonId(mappedSessionId)).style.borderColor = rgbToHex(colorArray);
                     console.log('Successfully added layer ' + curId + ' to map');
                 }
@@ -112,7 +122,7 @@ function getLayerBackgroundId(layerName, mappedSessionId) {
     return 'layer_background_' + curId;
 }
 
-function removeOnlyPoint(layerName, mappedSessionId) {
+function removeLayerWithBackground(layerName, mappedSessionId) {
     let curId = getCurId(layerName, mappedSessionId);
     let layerId = getLayerId(layerName, mappedSessionId);
     let sourceId = getSourceId(layerName, mappedSessionId);
@@ -131,10 +141,10 @@ function removeOnlyPoint(layerName, mappedSessionId) {
     return false;
 }
 
-function plotOnlyPointSource(layerName, mappedSessionId, mapLayer, colorArray, additional) {
+function plotPointSource(layerName, mappedSessionId, mapLayer, colorArray, additional) {
     let layerId = getLayerId(layerName, mappedSessionId);
     let sourceId = getSourceId(layerName, mappedSessionId);
-    let layerIdBackground = getLayerBackgroundId(layerName, mappedSessionId);
+    let layerBackgroundId = getLayerBackgroundId(layerName, mappedSessionId);
 
     if (map.getSource(sourceId)) {
         return;
@@ -146,7 +156,7 @@ function plotOnlyPointSource(layerName, mappedSessionId, mapLayer, colorArray, a
 
     // https://github.com/mapbox/mapbox-gl-style-spec/issues/97, 30.12.2019, 14:00
     map.addLayer({
-        "id": layerIdBackground,
+        "id": layerBackgroundId,
         "type": "circle",
         "source": sourceId,
         "paint": {
@@ -163,19 +173,10 @@ function plotOnlyPointSource(layerName, mappedSessionId, mapLayer, colorArray, a
             "icon-allow-overlap": true,
         },
     });
-
-    // Make layer clickable
-    // https://docs.mapbox.com/mapbox-gl-js/example/polygon-popup-on-click/ 30.12.2019, 15:15
-    map.on('click', layerId, function (e) {addGeoserverLayerClickEvent(e, additional.popupContentFunc)});
-    map.on('click', layerIdBackground, function (e) {addGeoserverLayerClickEvent(e, additional.popupContentFunc)});
-    map.on('mouseenter', layerId, changeToPointer);
-    map.on('mouseenter', layerIdBackground, changeToPointer);
-    map.on('mouseleave', layerId, changeToCursor);
-    map.on('mouseleave', layerIdBackground, changeToCursor);
-
+    popupAdderLayerWithBackground(layerId, layerBackgroundId, additional)
 }
 
-function removeOnlyPolygon(layerName, mappedSessionId) {
+function removeSingleLayer(layerName, mappedSessionId) {
     let curId = getCurId(layerName, mappedSessionId);
     let layerId = getLayerId(layerName, mappedSessionId);
     let sourceId = getSourceId(layerName, mappedSessionId);
@@ -213,10 +214,7 @@ function plotMapSearchSource(layerName, mappedSessionId, mapLayer, colorArray, a
         }
     });
 
-    // Add Popup
-    map.on('click', layerId, function (e) {addGeoserverLayerClickEvent(e, additional.popupContentFunc)});
-    map.on('mouseenter', layerId, changeToPointer);
-    map.on('mouseleave', layerId, changeToCursor);
+    popupAdderSingleLayer(layerId, additional)
 }
 
 function handleMapInteraction(e, mappedSessionId, colorArray) {
@@ -248,10 +246,7 @@ function addMapInteraction(mappedSessionId, colorArray) {
             success: function (mapLayer) {
                 let curId = getCurId(layerName, mappedSessionId);
                 console.log('Successfully retrieved layer ' + curId + ' from GeoServer');
-                console.log(mapLayer);
-
                 layerDict.plotFunc(layerName, mappedSessionId, mapLayer, colorArray, layerDict.additional);
-
             }
         })
     }
@@ -279,6 +274,86 @@ function removeMapInteraction(mappedSessionId) {
     }
 }
 
+function plotOldBbox(layerName, mappedSessionId, mapLayer, colorArray, additional) {
+    let sourceId = getSourceId(layerName, mappedSessionId);
+    let layerId = getLayerId(layerName, mappedSessionId);
+    let layerBackgroundId = getLayerBackgroundId(layerName, mappedSessionId);
+
+    map.addSource(sourceId, {
+        'type': 'geojson',
+        'data': mapLayer
+    });
+
+    map.addLayer({
+        "id": layerBackgroundId,
+        "type": "fill",
+        "source": sourceId,
+        "paint": {
+            'fill-color': buildRgba(colorArray, 0),
+            'fill-outline-color': buildRgba(colorArray, 0),
+        }
+    });
+
+    map.addLayer({
+        "id": layerId,
+        "type": "line",
+        "source": sourceId,
+        "paint": {
+            "line-color": buildRgba(colorArray, 1),
+            "line-width": 2,
+            "line-dasharray": [4, 2],
+        }
+    });
+    popupAdderLayerWithBackground(layerId, layerBackgroundId, additional)
+}
+
+function plotNewBbox(layerName, mappedSessionId, mapLayer, colorArray, additional) {
+    let sourceId = getSourceId(layerName, mappedSessionId);
+    let layerId = getLayerId(layerName, mappedSessionId);
+    let layerBackgroundId = getLayerBackgroundId(layerName, mappedSessionId);
+
+    map.addSource(sourceId, {
+        'type': 'geojson',
+        'data': mapLayer
+    });
+
+    // add Layer
+    map.addLayer({
+        "id": layerBackgroundId,
+        "type": "fill",
+        "source": sourceId,
+        "paint": {
+            'fill-color': buildRgba(colorArray, 0.2),
+            'fill-outline-color': buildRgba(colorArray, 0),
+        }
+    });
+
+    map.addLayer({
+        "id": layerId,
+        "type": "line",
+        "source": sourceId,
+        "paint": {
+            "line-color": buildRgba(colorArray, 1),
+            "line-width": 4,
+            "line-dasharray": [2, 1],
+        }
+    });
+    popupAdderLayerWithBackground(layerId, layerBackgroundId, additional)
+}
+
+function popupAdderLayerWithBackground(layerId, layerBackgroundId, additional) {
+    popupAdderSingleLayer(layerBackgroundId, additional);
+    popupAdderSingleLayer(layerId, additional);
+}
+
+function popupAdderSingleLayer(layerId, additional) {
+    // Make layer clickable
+    // https://docs.mapbox.com/mapbox-gl-js/example/polygon-popup-on-click/ 30.12.2019, 15:15
+    map.on('mouseenter', layerId, changeToPointer);
+    map.on('mouseleave', layerId, changeToCursor);
+    map.on('click', layerId, function (e) {addGeoserverLayerClickEvent(e, additional.popupContentFunc)});
+}
+
 // Change the cursor to a pointer when the mouse is over the states layer.
 function changeToPointer() {
     map.getCanvas().style.cursor = 'pointer';
@@ -290,28 +365,66 @@ function changeToCursor () {
 }
 
 function addGeoserverLayerClickEvent(e, popupContentFunc) {
+    // e.stopPropagation();
     let property = e.features[0].properties;
     new mapboxgl.Popup()
         .setLngLat(e.lngLat)
         .setHTML(popupContentFunc(property))
         .addTo(map);
-    e.stopPropagation();
 }
 
 // Popups
 function getUserPositionPopup(property) {
-    let content = 'Mapped Session: ' + property.mapped_session_id + '<br>Timestamp: ' + property.time_stamp;
+    let content = 'Mapped Session: ' + property.mapped_session_id + '<br>Timestamp: ' +
+        property.time_stamp;
     return getLayerPopupContent('User Position', content)
 }
 
 function getSpatialBookmarkPopup(property) {
-    let content = 'Mapped Session: ' + property.mapped_session_id + '<br> Timestamp: ' + property.time_stamp + '<br> notes: ' + property.notes;
+    let content = 'Mapped Session: ' + property.mapped_session_id + '<br> Timestamp: ' +
+        property.time_stamp + '<br> notes: ' + property.notes;
     return getLayerPopupContent('Spatial Bookmark', content)
 }
 
 function getMapSearchPopup(property) {
-    let content = 'Mapped Session: ' + property.mapped_session_id + '<br> Start Timestamp: ' + property.starttime_stamp + '<br> End Timestamp: ' + property.endtitme_stamp;
+    let content = 'Mapped Session: ' + property.mapped_session_id + '<br> Start Timestamp: ' +
+        property.starttime_stamp + '<br> End Timestamp: ' + property.endtitme_stamp;
     return getLayerPopupContent('Map Search', content)
+}
+
+function getClickInteractionPopup(property, content) {
+    return getLayerPopupContent('Map Interaction: Click', content)
+}
+
+function getPanInteractionPopup(property, content) {
+    return getLayerPopupContent('Map Interaction: Pan', content)
+}
+
+function getZoomInteractionText(property, content) {
+    return content + '<br> Old Zoom Level: ' + property.old_zoom_level + '<br> New Zoom Level: ' + property.new_zoom_level;
+}
+
+function getZoomInInteractionPopup(property, content) {
+    content = getZoomInteractionText(property);
+    return getLayerPopupContent('Map Interaction: Zoom In', content)
+}
+
+function getZoomOutInteractionPopup(property, content) {
+    content = getZoomInteractionText(property);
+    return getLayerPopupContent('Map Interaction: Zoom Out', content)
+}
+
+function getMapInteractionPopup(property) {
+    let content = 'Id: ' + property.id + '<br> Mapped Session: ' + property.mapped_session_id + '<br> Timestamp: ' + property.time_stamp;
+    if (property.is_click_interaction) {
+        return getClickInteractionPopup(property, content);
+    } else if (property.is_pan_interaction) {
+        return getPanInteractionPopup(property, content);
+    } else if (property.is_zoom_in_interaction) {
+        return getZoomInInteractionPopup(property, content);
+    } else if (property.is_zoom_out_interaction) {
+        return getZoomOutInteractionPopup(property, content)
+    }
 }
 
 function getLayerPopupContent(layerName, content) {
