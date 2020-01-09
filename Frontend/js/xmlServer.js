@@ -58,9 +58,12 @@ function getRightDropDownElemMain(elem) {
 }
 
 function getRightDropdownLink(elem) {
-    let rgbId = getRightBarId(elem['id']);
+    let colorBoxId = getColorBoxId(elem['id']);
+    let miButtonId = getMiButtonId(elem['id']);
     let html_elem = $( '<a><div>' + elem['id'] +
-        '<div class="color-box invisible" id="' + rgbId + '"></div></div>' +
+        '<div class="color-box invisible" id="' + colorBoxId + '"></div>' +
+        '<div class="mi-button invisible" id="' + miButtonId + '">MI</div>' +
+        '</div>' +
         '<div class="smaller-text"> Start: ' + elem['application_start'] + '</div>' +
         '<div class="smaller-text"> End: ' + elem['application_end'] + '</div></a>');
     html_elem.click(function () {loadMappedSessionLayers(elem['id'])});
@@ -138,6 +141,10 @@ $('#submitUpload').click(function () {
     })
 });
 
-function getRightBarId(mapped_session_id) {
-    return 'right_bar_' + mapped_session_id;
+function getColorBoxId(mappedSessionId) {
+    return 'color_box_' + mappedSessionId;
+}
+
+function getMiButtonId(mappedSessionId) {
+    return 'mi_button_' + mappedSessionId
 }

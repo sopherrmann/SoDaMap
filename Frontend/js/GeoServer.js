@@ -2,10 +2,11 @@ const geoServerUrl = "http://localhost:8082/geoserver";
 const wfsUrl = geoServerUrl + '/wfs';
 
 const geoserverLayers = {
-    // 'map_interaction',
+    // TODO set layer index > currently not possible https://github.com/mapbox/mapbox-gl-js/issues/7016, 03.01.2020, 22:20
+    // https://labs.mapbox.com/maki-icons/, 09.01.2020, 10:40
     'map_search': {
         'removeFunc': removeOnlyPolygon,
-        'plotFunc': plotOnlyPolygonSource,
+        'plotFunc': plotMapSearchSource,
         'additional': {'popupContentFunc': getMapSearchPopup}},
     'spatial_bookmark': {
         'removeFunc': removeOnlyPoint,
@@ -16,6 +17,12 @@ const geoserverLayers = {
         'plotFunc': plotOnlyPointSource,
         'additional': {'iconName': 'marker-15', 'popupContentFunc': getUserPositionPopup}},
 };
+const mapInteractionLayers = {
+    'where_clicked': {
+        'removeFunc': removeOnlyPoint,
+        'plotFunc': plotOnlyPointSource,
+        'additional': {'iconName': 'circle-11'},
+    }};
 
 function getLayerRequestData(properties) {
     return '<wfs:GetFeature service="WFS" version="1.0.0"\n' +
@@ -39,12 +46,19 @@ function getLayerRequestData(properties) {
 function loadMappedSessionLayers(mappedSessionId) {
     console.log('Loading mapped session ' + mappedSessionId);
 
+    let colorBoxId = $('#' + getColorBoxId(mappedSessionId));
+    let miButtonId = $('#' + getMiButtonId(mappedSessionId));
+
     let colorArray = getRandomColor();
+    // https://stackoverflow.com/questions/8587754/event-managment-replace-click-event, 09.01.2020, 11:00
+    miButtonId.unbind();
+    miButtonId.click(function (e) {handleMapInteraction(e, mappedSessionId, colorArray)});
+
+    removeMapInteraction(mappedSessionId);
     for (let layerName in geoserverLayers) {
         console.log(layerName);
         let layerDict = geoserverLayers[layerName];
 
-        let colorBoxId = $('#' + getRightBarId(mappedSessionId));
         if (!layerDict.removeFunc(layerName, mappedSessionId)) {
             $.ajax({
                 url: wfsUrl,
@@ -59,20 +73,21 @@ function loadMappedSessionLayers(mappedSessionId) {
                     let curId = getCurId(layerName, mappedSessionId);
                     console.log('Successfully retrieved layer ' + curId + ' from GeoServer');
 
-                    let sourceId = getSourceId(layerName, mappedSessionId);
-                    map.addSource(sourceId, {
-                        'type': 'geojson',
-                        'data': mapLayer
-                    });
-                    layerDict.plotFunc(layerName, mappedSessionId, colorArray, layerDict.additional);
+                    layerDict.plotFunc(layerName, mappedSessionId, mapLayer, colorArray, layerDict.additional);
 
+                    // Styling
                     colorBoxId.removeClass('invisible');
-                    document.getElementById(getRightBarId(mappedSessionId)).style.backgroundColor = rgbToHex(colorArray);
+                    miButtonId.removeClass('invisible');
+                    colorBoxId = document.getElementById(getColorBoxId(mappedSessionId));
+                    colorBoxId.style.backgroundColor = rgbToHex(colorArray);
+                    colorBoxId.style.borderColor = rgbToHex(colorArray);
+                    document.getElementById(getMiButtonId(mappedSessionId)).style.borderColor = rgbToHex(colorArray);
                     console.log('Successfully added layer ' + curId + ' to map');
                 }
             });
         } else {
             colorBoxId.addClass('invisible');
+            miButtonId.addClass('invisible');
         }
     }
     console.log('Finished layer loading')
@@ -116,10 +131,18 @@ function removeOnlyPoint(layerName, mappedSessionId) {
     return false;
 }
 
-function plotOnlyPointSource(layerName, mappedSessionId, colorArray, additional) {
+function plotOnlyPointSource(layerName, mappedSessionId, mapLayer, colorArray, additional) {
     let layerId = getLayerId(layerName, mappedSessionId);
     let sourceId = getSourceId(layerName, mappedSessionId);
     let layerIdBackground = getLayerBackgroundId(layerName, mappedSessionId);
+
+    if (map.getSource(sourceId)) {
+        return;
+    }
+    map.addSource(sourceId, {
+        'type': 'geojson',
+        'data': mapLayer
+    });
 
     // https://github.com/mapbox/mapbox-gl-style-spec/issues/97, 30.12.2019, 14:00
     map.addLayer({
@@ -170,9 +193,14 @@ function removeOnlyPolygon(layerName, mappedSessionId) {
     return false;
 }
 
-function plotOnlyPolygonSource(layerName, mappedSessionId, colorArray, additional) {
+function plotMapSearchSource(layerName, mappedSessionId, mapLayer, colorArray, additional) {
     let layerId = getLayerId(layerName, mappedSessionId);
     let sourceId = getSourceId(layerName, mappedSessionId);
+
+    map.addSource(sourceId, {
+        'type': 'geojson',
+        'data': mapLayer
+    });
 
     // add Layer
     map.addLayer({
@@ -189,6 +217,66 @@ function plotOnlyPolygonSource(layerName, mappedSessionId, colorArray, additiona
     map.on('click', layerId, function (e) {addGeoserverLayerClickEvent(e, additional.popupContentFunc)});
     map.on('mouseenter', layerId, changeToPointer);
     map.on('mouseleave', layerId, changeToCursor);
+}
+
+function handleMapInteraction(e, mappedSessionId, colorArray) {
+    e.stopPropagation();
+    console.log('MapInteraction Handler activate');
+
+    let miButton = $('#' + getMiButtonId(mappedSessionId));
+    if (miButton.hasClass('mi-button-active')) {
+        removeMapInteraction(mappedSessionId);
+    } else {
+        addMapInteraction(mappedSessionId, colorArray);
+    }
+}
+
+function addMapInteraction(mappedSessionId, colorArray) {
+    console.log('MapInteraction Adder activate');
+
+    for (let layerName in mapInteractionLayers) {
+        const layerDict = mapInteractionLayers[layerName];
+        $.ajax({
+            url: wfsUrl,
+            type: 'POST',
+            dataType: 'json',
+            contentType:"application/xml",
+            data: getLayerRequestData({
+                'mapped_session_id': mappedSessionId,
+                'layer': layerName,
+            }),
+            success: function (mapLayer) {
+                let curId = getCurId(layerName, mappedSessionId);
+                console.log('Successfully retrieved layer ' + curId + ' from GeoServer');
+                console.log(mapLayer);
+
+                layerDict.plotFunc(layerName, mappedSessionId, mapLayer, colorArray, layerDict.additional);
+
+            }
+        })
+    }
+
+    let miButtonId = getMiButtonId(mappedSessionId);
+    let miButton = $('#' + miButtonId);
+    miButton.addClass('mi-button-active');
+    document.getElementById(miButtonId).style.backgroundColor = rgbToHex(colorArray);
+}
+
+function removeMapInteraction(mappedSessionId) {
+    console.log('MapInteraction Remover active');
+    let remove = false;
+    for (let layerName in mapInteractionLayers){
+        const layerDict = mapInteractionLayers[layerName];
+        if (layerDict.removeFunc(layerName, mappedSessionId)) {
+            remove = true
+        }
+    }
+    if (remove) {
+        let miButtonId = getMiButtonId(mappedSessionId);
+        let miButton = $('#' + miButtonId);
+        miButton.removeClass('mi-button-active');
+        document.getElementById(miButtonId).style.backgroundColor = null;
+    }
 }
 
 // Change the cursor to a pointer when the mouse is over the states layer.
