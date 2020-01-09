@@ -4,15 +4,15 @@ const wfsUrl = geoServerUrl + '/wfs';
 const geoserverLayers = {
     // TODO set layer index > currently not possible https://github.com/mapbox/mapbox-gl-js/issues/7016, 03.01.2020, 22:20
     // https://labs.mapbox.com/maki-icons/, 09.01.2020, 10:40
-    'map_search': {
+    'map_search_view': {
         'removeFunc': removeSingleLayer,
         'plotFunc': plotMapSearchSource,
         'additional': {'popupContentFunc': getMapSearchPopup}},
-    'spatial_bookmark': {
+    'spatial_bookmark_view': {
         'removeFunc': removeLayerWithBackground,
         'plotFunc': plotPointSource,
         'additional': {'iconName': 'star-15', 'popupContentFunc': getSpatialBookmarkPopup}},
-    'user_position': {
+    'user_position_view': {
         'removeFunc': removeLayerWithBackground,
         'plotFunc': plotPointSource,
         'additional': {'iconName': 'marker-15', 'popupContentFunc': getUserPositionPopup}},
@@ -375,19 +375,19 @@ function addGeoserverLayerClickEvent(e, popupContentFunc) {
 
 // Popups
 function getUserPositionPopup(property) {
-    let content = 'Mapped Session: ' + property.mapped_session_id + '<br>Timestamp: ' +
+    let content = 'Id: ' + property.id + '<br> Mapped Session: ' + property.mapped_session_id + '<br>Timestamp: ' +
         property.time_stamp;
     return getLayerPopupContent('User Position', content)
 }
 
 function getSpatialBookmarkPopup(property) {
-    let content = 'Mapped Session: ' + property.mapped_session_id + '<br> Timestamp: ' +
+    let content = 'Id: ' + property.id + '<br> Mapped Session: ' + property.mapped_session_id + '<br> Timestamp: ' +
         property.time_stamp + '<br> notes: ' + property.notes;
     return getLayerPopupContent('Spatial Bookmark', content)
 }
 
 function getMapSearchPopup(property) {
-    let content = 'Mapped Session: ' + property.mapped_session_id + '<br> Start Timestamp: ' +
+    let content = 'Id: ' + property.id + '<br> Mapped Session: ' + property.mapped_session_id + '<br> Start Timestamp: ' +
         property.starttime_stamp + '<br> End Timestamp: ' + property.endtitme_stamp;
     return getLayerPopupContent('Map Search', content)
 }
