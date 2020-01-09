@@ -89,7 +89,6 @@
 	<a id="routing">Route</a>
 	<a id="upload">Upload</a>
 	<a id="exist-mapped-sessions">Existing</a>
-    <a id="addInfo">Add Info</a>
 	<a id="diary">Diary Study</a>
 </div>
 
@@ -180,44 +179,6 @@
 				<input type="submit" id="submitUploadQuest" value="Enter" name="submit" onclick="close()"/>
 			</div>
 			<br>
-		</div>
-	</div>
-</div>
-
-<!-- Add annotations to the uploaded files -->
-<div id="myAppInfo" class="input">
-	<div class="input-content">
-		<div class="input-header">
-			<span class="close">&times;</span>
-			<h2>Add Info</h2>
-		</div>
-		<div class="input-body">
-			<p>Here you can add info to your uploaded XML-file.</p><br>
-			<form method="post" enctype="multipart/form-data">
-				<p>Please select the XML-file where you want to add your personal quotes.</p>
-				<select>
-					<option value="" selected disabled hidden>Choose here</option>
-					<option value="volvo">Volvo</option>
-					<option value="saab">Saab</option>
-					<option value="opel">Opel</option>
-					<option value="audi">Audi</option>
-				</select>
-				<br>
-				<p>Please select the Point/Route where you want to add it.</p>
-				<select>
-					<option value="" selected disabled hidden>Choose here</option>
-					<option value="volvo">Volvo</option>
-					<option value="saab">Saab</option>
-					<option value="opel">Opel</option>
-					<option value="audi">Audi</option>
-				</select>
-				<br>
-				<p>Annotation:</p>
-				<input type="text" name="answer"/><br><br>
-
-				<input type="submit" value="Submit">
-				<input type="reset"><br>
-			</form>
 		</div>
 	</div>
 </div>

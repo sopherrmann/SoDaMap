@@ -171,15 +171,6 @@ function showUploadDialog() {
     upload.style.display = "block";
 }
 
-
-// Add information to the uploaded XML-files
-const add_info = document.getElementById("myAppInfo");
-document.getElementById("addInfo").addEventListener('click', addInfo);
-function addInfo() {
-    open();
-    add_info.style.display = "block";
-}
-
 // Diary Study Modal
 const diary_study = document.getElementById("myDiary");
 document.getElementById("diary").addEventListener('click', diary);
@@ -221,14 +212,14 @@ function close(){
     }
     upload.style.display = "none";
     diary_study.style.display = "none";
-    add_info.style.display = "none";
-    startinfo.style.display = "none";
+    // startinfo.style.display = "none";
     uploadQuest.style.display = "none";
     moreInfo.style.display = "none";
+
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
-    if (event.target===upload || event.target===diary_study || event.target===add_info || event.target===startinfo || event.target===uploadQuest) {
+    if (event.target===upload || event.target===diary_study || event.target===moreInfo || event.target===startinfo || event.target===uploadQuest) {
         close()
     }
 };
