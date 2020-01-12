@@ -33,6 +33,7 @@ services:
     depends_on:
       - postgis
   geoserver-proxy:
+    container_name: wb-geoserver-proxy
     build: nginx-proxy
     restart: on-failure
     ports:

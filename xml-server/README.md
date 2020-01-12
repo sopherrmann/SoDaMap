@@ -57,7 +57,7 @@ returns a list of all mapped_sessions which were manually created
 is used to upload mapped session xml files following the schema into the database.
 
 *annotation*
-1. ``/annotation/<entity_types>`` [GET]:  
+1. ``/annotation/entity_types`` [GET]:
 returns a list of annotatable entities
 1. ``/annotation/<entity_type>/<entity_id>`` [POST]:  
 adds a given annotation to the specified entity
@@ -66,7 +66,7 @@ adds a given annotation to the specified entity
 1. ``/mapped_sessions/new`` [POST]:  
 creates a new *mapped session* in the database. This is used for logging. A log session is also stored as mapped session.
 1. ``/mapped_sessions/<mapped_session_id>`` [GET]:   
-return the given mapped_session as XML file. Should be used to retrieve log sessions as XML.
+returns mapped session in JSON format
 1. ``/mapped_sessions/<mapped_session_id>`` [PATCH]:  
 Updates a given attribute of a mapped session. Currently only the end_application_time_stamp can be updated.
 1. ``/mapped_sessions/entity_types`` [GET]:  
@@ -74,3 +74,5 @@ Returns a list of all entities which can be added to a mapped_session
 1. ``/mapped_sessions/<mapped_session_id>/<entitiy_type>`` [POST]:  
 Adds an additional entity of the specified entity_type to the given mapped_session. Have a look into the
 example-requests folder to find possible request  bodies for different entities.
+1. ``/mapped_sessions/<mapped_session_id>/xml`` [GET]:
+return the given mapped_session as XML file. Should be used to retrieve log sessions as XML.
