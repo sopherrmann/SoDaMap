@@ -62,7 +62,6 @@ function addEntityFromServer(mappedSessionId, entityType, entityDict, createNew)
 
             let htmlElems = $('#' + htmlSingleEntityId);
             let entities = result.entity;
-            // entity has to be always a list > fix routing
             for (let idx in entities) {
                 let entity = entities[idx];
                 let entityPretty = syntaxHighlight(JSON.stringify(entity, null, "\t"));

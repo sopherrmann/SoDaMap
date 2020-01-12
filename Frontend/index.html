@@ -31,7 +31,7 @@
 
 <!-- Questionnaire about personal info -->
 <!-- Todo: Save the infos and don't show it again... But only if it isn't to much -->
-<!--<div id="personalInfo" class="input">
+<div id="personalInfo" class="input">
 	<div class="input-content">
 		<div class="input-header">
 			<span class="close">&times;</span>
@@ -41,12 +41,12 @@
 			<p>Please enter some personal information for research purpose. If already done, just close this modal.</p>
 			<br>
 			<div class="tab">General Info:
-				<p><input type="text" placeholder="First name" oninput="this.className = ''"></p>
-				<p><input type="text" placeholder="Last name" oninput="this.className = ''"></p>
-				<p><input type="number" placeholder="Age" oninput="this.className=''"></p>
+				<p><input id="first-name" type="text" placeholder="First name" oninput="this.className = ''"></p>
+				<p><input id="second-name" type="text" placeholder="Last name" oninput="this.className = ''"></p>
+				<p><input id="age" type="number" placeholder="Age" oninput="this.className=''"></p>
 			</div>
 			<br>
-			<div class="tab">Gender:<br>
+			<div id="gender-qest" class="tab">Gender:<br>
 				<input type="radio" name="gender" value="male"><a class="quest">Male</a><br>
 				<input type="radio" name="gender" value="female"><a class="quest">Female</a><br>
 			</div>
@@ -59,31 +59,16 @@
 			<div class="tab">Color-blindness:<br>
 				<input type="radio" name="blindness" value="yes" onclick="isChecked(1, 0)"><a class="quest">Yes</a><br>
 				<input type="radio" name="blindness" value="no" onclick="isChecked(0, 0)"><a class="quest">No</a><br>
-				<p><input class="onAgree" type="text" placeholder="Type of color blindness" oninput="this.className = ''"></p>
+				<p><input id="blind-type" class="onAgree" type="text" placeholder="Type of color blindness" oninput="this.className = ''"></p>
 			</div>
 			<br>
-			<div class="tab">Experience in using GIS applications:<br>
-				<a class="quest">Less</a><a class="quest" style="margin-left: 85.3%">More</a><br>
-				<input type="range" class="experience" name="experience" list="steps" oninput="showVal(this.value)" onchange="showVal(this.value)" style="width: 90%">
-				<input type="number" class="rangeOut" value="50" style="float: right">
-				<datalist id="steps">
-					<option value="0" ></option>
-					<option value="10"></option>
-					<option value="20"></option>
-					<option value="30"></option>
-					<option value="40"></option>
-					<option value="50"></option>
-					<option value="60"></option>
-					<option value="70"></option>
-					<option value="80"></option>
-					<option value="90"></option>
-					<option value="100"></option>
-				</datalist>
+			<div class="tab">Experience in using GIS applications [0 - 100]:<br>
+				<input id="gis-exp" type="number" class="rangeOut" value="50" min="0" max="100">
 			</div>
 			<input type="submit" id="submitUploadPerson" value="Enter" name="submit" onclick="close()"/>
 		</div>
 	</div>
-</div>-->
+</div>
 
 <!-- Side navigation -->
 <div class="sidenav">
@@ -232,9 +217,7 @@
 			</div>
 			<br>
 			<div class="tab">Familiarity with area of planning:<br>
-				<a class="quest">Less</a><a class="quest" style="margin-left: 85.3%">More</a><br>
-				<input type="range" class="experience" name="experience" list="steps" oninput="showVal(this.value)" onchange="showVal(this.value)" style="width: 90%">
-				<input type="number" class="rangeOut" value="50" style="float: right">
+				<input id="area-familiarity" type="number" class="rangeOut" value="50">
 			</div>
 			<br>
 			<div class="tab">Did you plan alone or in a group?<br>
@@ -243,9 +226,9 @@
 			</div>
 			<br>
 			<div class="tab">Did you complete your task successfully?<br>
-				<input type="radio" name="task" value="yes" onclick="isChecked(0, 1)"><a class="quest">Yes</a><br>
-				<input type="radio" name="task" value="no" onclick="isChecked(1, 1)"><a class="quest">No</a><br>
-				<p><input class="onAgree" type="text" placeholder="Why not?" oninput="this.className = ''"></p>
+				<input type="radio" name="task" value="yes" onclick="isChecked(0, 4)"><a class="quest">Yes</a><br>
+				<input type="radio" name="task" value="no" onclick="isChecked(1, 4)"><a class="quest">No</a><br>
+				<p><input id="task-failure" class="onAgree" type="text" placeholder="Why not?" oninput="this.className = ''"></p>
 			</div>
 			<br>
 			<div class="tab">Suggestions for improvements:<br>
@@ -310,6 +293,8 @@
 <script type='text/javascript' src="js/xmlServer.js"></script>
 <script type='text/javascript' src="js/GeoServer.js"></script>
 <script type='text/javascript' src="js/showMore.js"></script>
+<script type='text/javascript' src="js/questionaire.js"></script>
+<script type='text/javascript' src="js/loggingTemplates.js"></script>
 </body>
 
 </html>
