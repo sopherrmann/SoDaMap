@@ -6,10 +6,6 @@ const mappedUrl = mappedSessionUrl + "/mapped";
 const webUrl = mappedSessionUrl + "/web";
 const importUrl = mappedSessionUrl + "/import";
 const newMappedSessionUrl = mappedSessionUrl + "/new";
-const mappedSessionEntitiesUrl = mappedSessionUrl + "/entity_types";
-
-const annotationUrl = xmlServerURL + "annotation";
-const annotationEntitiesURL = annotationUrl + "/entity_types";
 
 // Dynamic server urls
 function getMappedSessionUrlById(mappedSessionId) {
@@ -26,6 +22,23 @@ function getMappedSessionXML(mappedSessionId) {
 
 function getAddAnnotationUrl(entityType, entityId) {
     return xmlServerURL + "/annotation/" + entityType + "/" + entityId;
+}
+
+document.body.onload = setWebSessionId;
+function setWebSessionId () {
+    $.ajax({
+        url: newMappedSessionUrl,
+        type: 'POST',
+        dataType: 'JSON',
+        success: function (response) {
+            document.getElementById("web-session-id").innerHTML = response.web_session_id;
+            console.log('WebSessionId set to ' + response.web_session_id);
+        }
+    });
+}
+
+function getWebSessionId() {
+    return document.getElementById("web-session-id").innerHTML;
 }
 
 
