@@ -1,5 +1,5 @@
 {
-  "time_stamp": "2019-01-01T01:03:00.2",
+  "time_stamp": "2019-01-01T01:03:00.2Z",
   "geom": {
     "x": 16.301443,
     "y": 48.156500
@@ -7,8 +7,8 @@
   "is_zoom_in_interaction": true,
 
   "old_zoom_level": 5,
-  "old_bbox_time_stamp_lr": "2019-04-01T02:03:00.0",
-  "old_bbox_time_stamp_ul": "2019-04-01T02:07:00.0",
+  "old_bbox_time_stamp_lr": "2019-04-01T02:03:00.0Z",
+  "old_bbox_time_stamp_ul": "2019-04-01T02:07:00.0Z",
   "old_bbox_geom": {
     "xmin": 16.337877,
     "xmax": 16.470964,
@@ -17,8 +17,8 @@
   },
 
   "new_zoom_level": 7,
-  "new_bbox_time_stamp_lr": "2019-04-01T01:03:00.0",
-  "new_bbox_time_stamp_ul": "2019-04-01T01:02:00.0",
+  "new_bbox_time_stamp_lr": "2019-04-01T01:03:00.0Z",
+  "new_bbox_time_stamp_ul": "2019-04-01T01:02:00.0Z",
   "new_bbox_geom": {
     "xmin": 16.364609,
     "xmax": 16.407084,

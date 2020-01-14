@@ -1,6 +1,6 @@
 {
-	"start_routing_interface_time_stamp": "2019-01-01T00:00:00.1",
-	"end_routing_interface_send_request_or_interface_closed_time_sta": "2019-01-02T02:00:00.13",
+	"start_routing_interface_time_stamp": "2019-01-01T00:00:00.1Z",
+	"end_routing_interface_send_request_or_interface_closed_time_sta": "2019-01-02T02:00:00.13Z",
 	"origin_text_box_history": {
 		"text_with_suggestion": [
 			{

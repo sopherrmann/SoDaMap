@@ -1,8 +1,8 @@
 {
-  "starttime_stamp": "2019-01-01T01:00:08.2",
-  "endtime_stamp": "2019-01-01T02:00:08.2",
-  "bbox_time_stamp_lr": "2019-04-01T02:03:10.0",
-  "bbox_time_stamp_ul": "2019-04-01T02:07:11.0",
+  "starttime_stamp": "2019-01-01T01:00:08.2Z",
+  "endtime_stamp": "2019-01-01T02:00:08.2Z",
+  "bbox_time_stamp_lr": "2019-04-01T02:03:10.0Z",
+  "bbox_time_stamp_ul": "2019-04-01T02:07:11.0Z",
   "bbox_geom": {
     "xmin": 16.337877,
     "xmax": 16.470964,

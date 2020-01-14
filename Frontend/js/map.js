@@ -100,8 +100,8 @@ geocoder.on('result', function(T) {
     global_result = T;
     let endSearchTime = new Date().toISOString();
 
-    add_user_pos_event(currentDate);
-    add_map_search_event(global_result, searchText, allSugest, bb_search, startSearchTime, endSearchTime)
+    addUserPosEvent(currentDate);
+    addMapSearchEvent(global_result, searchText, allSugest, bb_search, startSearchTime, endSearchTime)
 });
 
 directions.on('route', function (T) {
@@ -117,11 +117,11 @@ map.on('click', function (T) {
     click = true;
     let pos = T.lngLat;
     if (bb_search === null && zoomed === false) {
-        let click_event = add_map_interaction_click_event(currentDate, pos, click, bb_start, startDate, clickDate)
+        addMapInteractionClickEvent(currentDate, pos, click, bb_start, startDate, clickDate)
     }else if(bb_search === null) {
-        let click_event = add_map_interaction_click_event(currentDate, pos, click, bb_start, zoomDate, clickDate)
+        addMapInteractionClickEvent(currentDate, pos, click, bb_start, zoomDate, clickDate)
     }else {
-        let click_event = add_map_interaction_click_event(currentDate, pos, click, bb_search, zoomDate, clickDate)
+        addMapInteractionClickEvent(currentDate, pos, click, bb_search, zoomDate, clickDate)
     }
     click = false
 });
@@ -144,145 +144,46 @@ map.on('zoomend', function() {
     xmax_new = bb.getEast();
     zoomDate = new Date().toISOString();
     zoomed = true;
-    let zoom_event = add_map_interaction_zoom_event(zoomDate, zoomDateOld, zoomed);
+    let zoom_event = addMapInteractionZoomEvent(zoomDate, zoomDateOld, zoomed);
     zoomed = false;
     zoomDateOld = zoomDate;
 });
 
-function add_user_pos_event(currentDate) {
-    let add_user_pos_event_string = '{\n\t"time_stamp": ' + currentDate + ',\n' +
-        '\t"geom": {\n' +
-        '\t\t"x": ' + global_center['0'] + '\n' +
-        '\t\t"y": ' + global_center['1'] + '\n' +
-        '\t}\n'+
-        '}';
-    console.log('User position' + add_user_pos_event_string);
-    return(add_user_pos_event_string)
+function addUserPosEvent(currentDate) {
+    console.log('userPosition event');
+    let bodyJson = getUserPositionRequestTemplate(currentDate, global_center['0'], global_center['1']);
+    uploadLoggingEvent('user_position', bodyJson)
 }
 
-function add_map_interaction_click_event(currentDate, pos, click, bb, Date, clickDate) {
-    let ymin_new = bb.getSouth();
-    let ymax_new = bb.getNorth();
-    let xmin_new = bb.getWest();
-    let xmax_new = bb.getEast();
-    let add_map_interaction_click_string = '{ \n \t"time_stamp": ' + currentDate + ',\n' +
-        '\t"geom": {\n' +
-        '\t\t"x": ' + global_center['0'] + '\n' +
-        '\t\t"y": ' + global_center['1'] + '\n' +
-        '\t},\n' +
-        '\t"is_click_interaction":' + click + ',\n' +
-        '\t"new_bbox_time_stamp_lr":' + Date + ',\n' +
-        '\t"new_bbox_time_stamp_ul":' + Date + '\n' +
-        '\t"new_bbox_geom": { \n' +
-        '\t\t"xmin": ' + xmin_new + ',\n' +
-        '\t\t"xmax": ' + xmax_new + ',\n' +
-        '\t\t"ymin": ' + ymin_new + ',\n' +
-        '\t\t"ymax": ' + ymax_new + ',\n' +
-        '\t},\n' +
-        '\t"where_clicked_geom": {\n' +
-        '\t\t"x": ' + pos.lng + '\n' +
-        '\t\t"y": ' + pos.lat + '\n' +
-        '\t},\n' +
-        '\t"where_clicked_time_stamp":' + clickDate + '\n' +
-        '}';
-    console.log('Map interaction click' + add_map_interaction_click_string);
-    return(add_map_interaction_click_string);
+function addMapInteractionClickEvent(currentDate, pos, click, bb, Date, clickDate) {
+    console.log('Click event');
+    let bodyJson = getClickRequestTemplate(currentDate, pos, bb, Date, clickDate, global_center['0'], global_center['1']);
+    uploadLoggingEvent('map_interaction', bodyJson)
 }
 
-function add_map_interaction_zoom_event(zoomDate, zoomDateOld, zoomed) {
-    let add_map_interaction_zoom_event_string = '{ \n \t"time_stamp": ' + currentDate + ',\n' +
-        '\t"geom": {\n' +
-        '\t\t"x": ' + global_center['0'] + '\n' +
-        '\t\t"y": ' + global_center['1'] + '\n' +
-        '\t},\n' +
-        '\t"is_zoom_in_interaction":' + zoomed + ',\n\n' +
-        '\t"old_zoom_level":' + level_old + ',\n' +
-        '\t"old_bbox_time_stamp_lr":' + zoomDateOld + ',\n' +
-        '\t"old_bbox_time_stamp_ul":' + zoomDateOld + '\n' +
-        '\t"old_bbox_geom": { \n' +
-        '\t\t"xmin": ' + xmin_old + ',\n' +
-        '\t\t"xmax": ' + xmax_old + ',\n' +
-        '\t\t"ymin": ' + ymin_old + ',\n' +
-        '\t\t"ymax": ' + ymax_old + ',\n' +
-        '\t},\n' +
-        '\t"new_zoom_level":' + level_new + ',\n' +
-        '\t"new_bbox_time_stamp_lr":' + zoomDate + ',\n' +
-        '\t"new_bbox_time_stamp_ul":' + zoomDate + '\n' +
-        '\t"new_bbox_geom": { \n' +
-        '\t\t"xmin": ' + xmin_new + ',\n' +
-        '\t\t"xmax": ' + xmax_new + ',\n' +
-        '\t\t"ymin": ' + ymin_new + ',\n' +
-        '\t\t"ymax": ' + ymax_new + ',\n' +
-        '\t}\n' +
-        '}';
-    console.log('Zoom ' + add_map_interaction_zoom_event_string);
-    return(add_map_interaction_zoom_event_string);
+function addMapInteractionZoomEvent(zoomDateNew, zoomDateOld, zoomed) {
+    console.log("zoom event");
+    let bboxNew = {
+        "xmin": xmin_new,
+        "xmax": xmax_new,
+        "ymin": ymin_new,
+        "ymax": ymax_new
+    };
+    let bboxOld = {
+        "xmin": xmin_old,
+        "xmax": xmax_old,
+        "ymin": ymin_old,
+        "ymax": ymax_old
+    };
+    let bodyJson = getZoomRequestTemplate(currentDate, zoomDateNew, level_new, bboxNew, zoomDateOld, level_old, bboxOld, global_center['0'], global_center['1']);
+    uploadLoggingEvent('map_interaction', bodyJson)
 }
 
-function add_map_search_event(T, searchText, allSugest, bb, startSearchTime, endSearchTime) {
-    let ymin = bb.getSouth();
-    let ymax = bb.getNorth();
-    let xmin = bb.getWest();
-    let xmax = bb.getEast();
-    for( let i = allSugest.length-1; i--;){
-        if ( allSugest[i].text === T.result.text) allSugest.splice(i, 1);
-    }
-    let add_map_search_event_string =  '{ \n \t"starttime_stamp": ' + startSearchTime + ',\n' +
-        '\t"endtime_stamp": ' + endSearchTime + ',\n' +
-        '\t"bbox_time_stamp_lr": ' + startSearchTime + ',\n' +
-        '\t"bbox_time_stamp_ul": ' + endSearchTime + '\n' +
-        '\t"bbox_geom": { \n' +
-        '\t\t"xmin": ' + xmin + ',\n' +
-        '\t\t"xmax": ' + xmax + ',\n' +
-        '\t\t"ymin": ' + ymin + ',\n' +
-        '\t\t"ymax": ' + ymax + ',\n' +
-        '\t},\n' +
-        '\t"text_with_suggestions": [\n' +
-        '\t\t{\n' +
-        '\t\t\t"text_typed":' + searchText + ',\n' +
-        '\t\t\t"suggestion_chosen":' + T.result.text + ',\n' +
-        '\t\t\t"suggestions": [\n' +
-        '\t\t\t\t{"suggestion":' + T.result.text + '},\n' +
-        '\t\t\t\t{"suggestion":' + allSugest[Math.floor(Math.random() * allSugest.length)].text + '},\n' +
-        '\t\t\t]' + '\t\t}, {\n' +
-        '\t\t\t"text_typed":' + searchText +
-        '\t\t}\n]\n}';
-    console.log('Map search' + add_map_search_event_string)
-}
+function addMapSearchEvent(T, searchText, allSugest, bb, startSearchTime, endSearchTime) {
+    console.log('mapSearch event');
 
-// Todo: Some information cannot be retrieved
-function add_routing_event() {
-    let add_routing_event_string = '{ \n \t"start_routing_interface_time_stamp": ' + startRoutingTime + ',\n' +
-        '\t"end_routing_interface_send_request_or_interface_closed_time_sta": ' + endRoutingTime + ',\n' +
-        '\t"origin_text_box_history": {\n' +
-        '\t\t"text_with_suggestion": [\n' +
-        '\t\t\t{\n' +
-        '\t\t\t\t"text_typed": ' + '???' +',\n' +
-        '\t\t\t\t"suggestion_chosen": ' + startPoint +',\n' +
-        '\t\t\t\t"suggestions": [\n' +
-        '\t\t\t\t\t{"suggestion": ' +  + '},\n' +
-        '\t\t\t\t\t{"suggestion": ' +  + '},\n' +
-        '\t\t\t\t]\n' +
-        '\t\t\t}, {\n' +
-        '\t\t\t\t"text_typed": ' + '???' + ',\n' +
-        '\t\t\t\t"suggestion_chosen": ' +  + ',\n' +
-        '\t\t\t\t"suggestions": [\n' +
-        '\t\t\t\t\t{"suggestion": ' +  + '},\n' +
-        '\t\t\t\t\t{"suggestion": ' +  + '},\n' +
-        '\t\t\t\t]\n' +
-        '\t\t\t}\n' +
-        '\t\t]\n' +
-        '\t},\n' +
-        '\t"destination_text_box_history": {\n' +
-        '\t\t"text_with_suggestion":\n' +
-        '\t\t[\n' +
-        '\t\t\t{' +
-        '\t\t\t\t"text_typed": ' + '???' +',\n' +
-        '\t\t\t\t"suggestion_chosen": ' + endPoint +',\n' +
-        '\t\t\t}\n' +
-        '\t\t]\n' +
-        '\t}\n' +
-        '}'
+    let bodyJson = getMapSearchRequestTemplate(searchText, T.result.text, allSugest, bb, startSearchTime, endSearchTime);
+    uploadLoggingEvent('map_search', bodyJson)
 }
 
 function isChecked(value, i) {
@@ -296,10 +197,6 @@ function isChecked(value, i) {
         text.style.display = "none";
         text.value = "none";
     }
-}
-
-function showVal(newVal){
-    document.getElementById("rangeOut").value = newVal;
 }
 
 // Submit
