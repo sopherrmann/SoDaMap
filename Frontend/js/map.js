@@ -75,33 +75,30 @@ const directions = new MapboxDirections({
     interactive: false
 });
 
-// Add tracking functionality
-// set start variables
-global_center = [null , null];
-bb_start = map.getBounds();
-bb_search = null;
-zoomed = false;
-click = false;
-startDate = new Date().toISOString();
-zoomDateOld = startDate;
-currentDate = null;
+// Add tracking functionality - set start variables
+// zoom
+let zoomDateOld = null;
+let zoomLevelOld = null;
+let zoomBboxOld = null;
+
+// map search - text with suggestions
+let searchText = null;
+let allSug = null;
 
 // geocoder all search results
 geocoder.on('results', function(T) {
     searchText = T.query["0"];
-    allSugest = T.features;
+    allSug = T.features;
 });
 
 // geocoder search result clicked
 geocoder.on('result', function(T) {
-    currentDate = new Date().toISOString();
-    global_center = T.result.center;
-    bb_search = map.getBounds();
-    global_result = T;
-    let endSearchTime = new Date().toISOString();
+    let bbox = map.getBounds();
+    let currentDate = new Date().toISOString();
+    let center = T.result.center;
 
-    addUserPosEvent(currentDate);
-    addMapSearchEvent(global_result, searchText, allSugest, bb_search, startSearchTime, endSearchTime)
+    addUserPosEvent(currentDate, center);
+    addMapSearchEvent(T.result.text, searchText, allSug, bbox, startSearchTime, currentDate)
 });
 
 directions.on('route', function (T) {
@@ -114,75 +111,47 @@ directions.on('route', function (T) {
 // map click interaction
 map.on('click', function (T) {
     let clickDate = new Date().toISOString();
-    click = true;
-    let pos = T.lngLat;
-    if (bb_search === null && zoomed === false) {
-        addMapInteractionClickEvent(currentDate, pos, click, bb_start, startDate, clickDate)
-    }else if(bb_search === null) {
-        addMapInteractionClickEvent(currentDate, pos, click, bb_start, zoomDate, clickDate)
-    }else {
-        addMapInteractionClickEvent(currentDate, pos, click, bb_search, zoomDate, clickDate)
-    }
-    click = false
+    let bbox = map.getBounds();
+    let center = map.getCenter();
+    let clickPos = T.lngLat;
+    addMapInteractionClickEvent(clickDate, clickPos, bbox, clickDate, clickDate, center);
 });
 
 // map zoom interaction
 map.on('zoomstart', function() {
-    level_old = map.getZoom();
-    let bb = map.getBounds();
-    ymin_old = bb.getSouth();
-    ymax_old = bb.getNorth();
-    xmin_old = bb.getWest();
-    xmax_old = bb.getEast();
+    zoomDateOld = new Date().toISOString();
+    zoomLevelOld = map.getZoom();
+    zoomBboxOld = map.getBounds();
 });
 map.on('zoomend', function() {
-    level_new = map.getZoom();
-    let bb = map.getBounds();
-    ymin_new = bb.getSouth();
-    ymax_new = bb.getNorth();
-    xmin_new = bb.getWest();
-    xmax_new = bb.getEast();
-    zoomDate = new Date().toISOString();
-    zoomed = true;
-    let zoom_event = addMapInteractionZoomEvent(zoomDate, zoomDateOld, zoomed);
-    zoomed = false;
-    zoomDateOld = zoomDate;
+    let bboxNew = map.getBounds();
+    let center = map.getCenter();
+    let levelNew = map.getZoom();
+    let zoomDate = new Date().toISOString();
+    addMapInteractionZoomEvent(zoomDate, zoomDate, bboxNew, levelNew, zoomDateOld, zoomBboxOld, zoomLevelOld, center);
 });
 
-function addUserPosEvent(currentDate) {
+function addUserPosEvent(currentDate, center) {
     console.log('userPosition event');
-    let bodyJson = getUserPositionRequestTemplate(currentDate, global_center['0'], global_center['1']);
+    let bodyJson = getUserPositionRequestTemplate(currentDate, center);
     uploadLoggingEvent('user_position', bodyJson)
 }
 
-function addMapInteractionClickEvent(currentDate, pos, click, bb, Date, clickDate) {
+function addMapInteractionClickEvent(currentDate, clickPos, bbox, bboxDate, clickDate, center) {
     console.log('Click event');
-    let bodyJson = getClickRequestTemplate(currentDate, pos, bb, Date, clickDate, global_center['0'], global_center['1']);
+    let bodyJson = getClickRequestTemplate(currentDate, clickPos, bbox, bboxDate, clickDate, center);
     uploadLoggingEvent('map_interaction', bodyJson)
 }
 
-function addMapInteractionZoomEvent(zoomDateNew, zoomDateOld, zoomed) {
+function addMapInteractionZoomEvent(currentDate, zoomDateNew, bboxNew, levelNew, zoomDateOld, bboxOld, levelOld, center) {
     console.log("zoom event");
-    let bboxNew = {
-        "xmin": xmin_new,
-        "xmax": xmax_new,
-        "ymin": ymin_new,
-        "ymax": ymax_new
-    };
-    let bboxOld = {
-        "xmin": xmin_old,
-        "xmax": xmax_old,
-        "ymin": ymin_old,
-        "ymax": ymax_old
-    };
-    let bodyJson = getZoomRequestTemplate(currentDate, zoomDateNew, level_new, bboxNew, zoomDateOld, level_old, bboxOld, global_center['0'], global_center['1']);
+    let bodyJson = getZoomRequestTemplate(currentDate, zoomDateNew, levelNew, bboxNew, zoomDateOld, levelOld, bboxOld, center);
     uploadLoggingEvent('map_interaction', bodyJson)
 }
 
-function addMapSearchEvent(T, searchText, allSugest, bb, startSearchTime, endSearchTime) {
+function addMapSearchEvent(sugChosen, textTyped, allSugest, bb, startSearchTime, endSearchTime) {
     console.log('mapSearch event');
-
-    let bodyJson = getMapSearchRequestTemplate(searchText, T.result.text, allSugest, bb, startSearchTime, endSearchTime);
+    let bodyJson = getMapSearchRequestTemplate(textTyped, sugChosen, allSugest, bb, startSearchTime, endSearchTime);
     uploadLoggingEvent('map_search', bodyJson)
 }
 

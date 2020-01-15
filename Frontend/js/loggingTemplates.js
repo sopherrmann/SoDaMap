@@ -36,31 +36,31 @@ function getMapSearchRequestTemplate(textTyped, sugChosen, allSug, bbox, startSe
 
 }
 
-function getUserPositionRequestTemplate(currentDate, x, y) {
+function getUserPositionRequestTemplate(currentDate, center) {
     return {
         "time_stamp": currentDate,
         "geom": {
-            "x": x,
-            "y": y,
+            "x": center[0],
+            "y": center[1],
         }
     }
 }
 
-function getClickRequestTemplate(currentDate, pos, bb, Date, clickDate, x, y) {
+function getClickRequestTemplate(currentDate, pos, bbox, bboxDate, clickDate, center) {
     return {
         "time_stamp": currentDate,
         "geom": {
-            "x": x,
-            "y": y,
+            "x": center.lng,
+            "y": center.lat,
         },
         "is_click_interaction": true,
-        "new_bbox_time_stamp_lr": Date,
-        "new_bbox_time_stamp_ul": Date,
+        "new_bbox_time_stamp_lr": bboxDate,
+        "new_bbox_time_stamp_ul": bboxDate,
         "new_bbox_geom": {
-            "xmin": bb.getWest(),
-            "xmax": bb.getEast(),
-            "ymin": bb.getSouth(),
-            "ymax": bb.getNorth()
+            "xmin": bbox.getWest(),
+            "xmax": bbox.getEast(),
+            "ymin": bbox.getSouth(),
+            "ymax": bbox.getNorth(),
         },
         "where_clicked_geom": {
             "x": pos.lng,
@@ -70,13 +70,13 @@ function getClickRequestTemplate(currentDate, pos, bb, Date, clickDate, x, y) {
     }
 }
 
-function getZoomRequestTemplate(currentDate, zoomDateNew, levelNew, bboxNew, zoomDateOld, levelOld, bboxOld, x, y) {
+function getZoomRequestTemplate(currentDate, zoomDateNew, levelNew, bboxNew, zoomDateOld, levelOld, bboxOld, center) {
     let zoomedIn = levelNew < levelOld;
     return {
         "time_stamp": currentDate,
         "geom": {
-            "x": x,
-            "y": y,
+            "x": center.lng,
+            "y": center.lat,
         },
         "is_zoom_in_interaction": zoomedIn,
         "is_zoom_out_interaction": !zoomedIn,
@@ -84,19 +84,19 @@ function getZoomRequestTemplate(currentDate, zoomDateNew, levelNew, bboxNew, zoo
         "old_bbox_time_stamp_lr": zoomDateOld,
         "old_bbox_time_stamp_ul": zoomDateOld,
         "old_bbox_geom": {
-            "xmin": bboxOld["xmin"],
-            "xmax": bboxOld["xmax"],
-            "ymin": bboxOld["ymin"],
-            "ymax": bboxOld["ymax"],
+            "xmin": bboxOld.getWest(),
+            "xmax": bboxOld.getEast(),
+            "ymin": bboxOld.getSouth(),
+            "ymax": bboxOld.getNorth(),
         },
         "new_zoom_level": levelNew,
         "new_bbox_time_stamp_lr": zoomDateNew,
         "new_bbox_time_stamp_ul": zoomDateNew,
         "new_bbox_geom": {
-            "xmin": bboxNew["xmin"],
-            "xmax": bboxNew["xmax"],
-            "ymin": bboxNew["ymin"],
-            "ymax": bboxNew["ymax"],
+            "xmin": bboxNew.getWest(),
+            "xmax": bboxNew.getEast(),
+            "ymin": bboxNew.getSouth(),
+            "ymax": bboxNew.getNorth(),
         },
     }
 }
