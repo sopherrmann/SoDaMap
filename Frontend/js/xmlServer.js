@@ -36,6 +36,23 @@ function setWebSessionId () {
         }
     });
 }
+window.onbeforeunload = setWebSessionEnd;
+function setWebSessionEnd() {
+    let bodyJson = {
+        "end_time": new Date().toISOString(),
+    };
+
+    $.ajax({
+        url: getMappedSessionUrlById(getWebSessionId()),
+        type: 'PATCH',
+        contentType: 'application/json',
+        processData: false,
+        data: JSON.stringify(bodyJson),
+        success: function (respone) {
+            console.log('WebSession end time added.');
+        }
+    })
+}
 
 function getWebSessionId() {
     return document.getElementById("web-session-id").innerHTML;
