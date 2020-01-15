@@ -18,7 +18,7 @@ def create_bbox(ul: List[float], lr: List[float], srid: int = None):
 
 def _create_bbox(xmin: float, ymax: float, xmax: float, ymin: float, srid: int = None):
     srid = srid if srid else 4326
-    coords = f'({xmin} {ymin}, {xmin} {ymax}, {xmax} {ymax}, {xmax} {ymax}, {xmin} {ymin})'
+    coords = f'({xmin} {ymin}, {xmin} {ymax}, {xmax} {ymax}, {xmax} {ymin}, {xmin} {ymin})'
     return f'SRID={srid};POLYGON({coords})'
 
 
@@ -77,14 +77,14 @@ def apply_to_entity(json_dict: dict, entity):
 
 
 def time_to_timestamp(time: str) -> datetime:
-    # TODO: Settle on timestamp format
     fmt = '%Y-%m-%dT%H:%M:%S.%fZ'
-    return datetime.strptime(time, fmt)
+    if time:
+        return datetime.strptime(time, fmt)
 
 
 def timestamp_to_time(time: datetime) -> str:
     # Same format as above
-    fmt = '%Y-%m-%dT%H:%M:%S.%f'
+    fmt = '%Y-%m-%dT%H:%M:%S.%fZ'
     return time.strftime(fmt)
 
 
