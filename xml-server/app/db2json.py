@@ -112,6 +112,8 @@ class ParseDbJson:
         ]
 
     def get_routing(self, entities: List[Routing]):
+        if len(entities) == 0:
+            return []
         entity = entities[0]
         return [{
             'Id': entity.id,
@@ -145,8 +147,13 @@ class ParseDbJson:
         return {
             'textTyped': tws.text_typed,
             'suggestionChosen': tws.suggestion_chosen,
-            'suggestions': tws.suggestions
+            'suggestions': self._get_suggestions(tws.suggestions)
         }
+
+    def _get_suggestions(self, suggestions) -> List[dict]:
+        return [{
+            'suggestion': sug.suggestion,
+        } for sug in suggestions]
 
     def _get_bbox(self, geom_elem, time_lr, time_ul) -> dict:
         xmin, ymin, xmax, ymax = wkb_to_xy(geom_elem)

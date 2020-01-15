@@ -84,9 +84,10 @@ def route_create_new_mapped_session():
 @app.route('/mapped_sessions/<int:mapped_session_id>', methods=['PATCH', 'GET'])
 def route_mapped_session_handler(mapped_session_id: int):
     if request.method == 'PATCH':
-        route_update_mapped_session(mapped_session_id)
+        return route_update_mapped_session(mapped_session_id)
     if request.method == 'GET':
-        entity = ParseDbJson().get_mapped_session(mapped_session_id)
+        mapped_session = get_mapped_session_by_id_eager(mapped_session_id, 'annotation')
+        entity = ParseDbJson().get_mapped_session(mapped_session)
         return jsonify({
             'status': 200,
             'mapped_session_id': mapped_session_id,
