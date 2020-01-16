@@ -114,6 +114,22 @@ function getRightDropDownButtons(mappedSessionId) {
     return button;
 }
 
+// https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link, 16.01.2020, 19:00
+var saveData = (function () {
+    let a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    return function (result, fileName) {
+        let xml = result.children[0].outerHTML,
+            blob = new Blob([xml], {type: "text/xml"}),
+            url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+}());
+
 function getXML(mappedSessionId) {
     console.log('Loading XML');
     $.ajax({
@@ -122,20 +138,10 @@ function getXML(mappedSessionId) {
         dataType: 'xml',
         success: function (result) {
             console.log('Retrieved XML ' +  mappedSessionId + ' from server');
-
-            let xml = result.children[0].outerHTML;
-            let blob = new Blob([xml], {type: 'text/xml'});
-
-            const url = window.URL.createObjectURL(blob);
-            const html_elem = document.createElement('mapped_session_xml_download');
-            html_elem.style.display = 'none';
-            html_elem.href = url;
-            html_elem.download = 'mapped_session_' + mappedSessionId + '.xml';
-            document.body.appendChild(html_elem);
-            html_elem.click();
-            window.URL.revokeObjectURL(url);
-
-            console.log('Downloaded ' + mappedSessionId + ' xml');
+            saveData(result, 'mapped_session_' + mappedSessionId + '.xml')
+        },
+        error: function (result) {
+            alert('The requested Mapped- or WebSession cannot be downloaded! Maybe required entities are missing')
         }
     });
 }
