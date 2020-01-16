@@ -265,7 +265,6 @@ document.getElementsByClassName("close")[0].addEventListener('click', close);
 document.getElementsByClassName("close")[1].addEventListener('click', close);
 document.getElementsByClassName("close")[2].addEventListener('click', close);
 document.getElementsByClassName("close")[3].addEventListener('click', close);
-document.getElementsByClassName("close")[4].addEventListener('click', close);
 function close(){
     if (value_rout === 1) {
         document.getElementById("routing").style.backgroundColor = "cornflowerblue";
@@ -279,7 +278,6 @@ function close(){
     upload.style.display = "none";
     diary_study.style.display = "none";
     startinfo.style.display = "none";
-    uploadQuest.style.display = "none";
     moreInfo.style.display = "none";
 
 }
