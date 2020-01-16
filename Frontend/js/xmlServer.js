@@ -173,7 +173,12 @@ $('#submitUpload').click(function () {
         contentType: false,
         processData: false,
         success: function () {
-            console.log('Successfully uploaded file')
+            console.log('Successfully uploaded file');
+            close();
+        },
+        error: function () {
+            alert('Upload failed');
+            close();
         }
     })
 });

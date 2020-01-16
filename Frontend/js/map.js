@@ -161,14 +161,6 @@ function isChecked(value, i) {
     }
 }
 
-// Submit
-uploadQuest = document.getElementById("uploadQuest");
-document.getElementById("submitUpload").addEventListener('click', submitU);
-function submitU() {
-    open();
-    uploadQuest.style.display = "block"
-}
-
 // search button
 let value_search = 0;
 let startSearchTime = new Date().toISOString();
@@ -283,7 +275,7 @@ function close(){
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
-    if (event.target===upload || event.target===diary_study || event.target===moreInfo || event.target===startinfo || event.target===uploadQuest) {
+    if (event.target===upload || event.target===diary_study || event.target===moreInfo || event.target===startinfo) {
         close()
     }
 };
