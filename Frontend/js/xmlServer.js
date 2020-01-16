@@ -94,6 +94,7 @@ function getRightDropdownLink(elem) {
         '<div class="color-box invisible" id="' + colorBoxId + '"></div>' +
         '<div class="mi-button invisible" id="' + miButtonId + '">MI</div>' +
         '</div>' +
+        '<div class="smaller-text"> Type: ' + elem['session_type'] + '</div>' +
         '<div class="smaller-text"> Start: ' + elem['application_start'] + '</div>' +
         '<div class="smaller-text"> End: ' + elem['application_end'] + '</div></a>');
     html_elem.click(function () {loadMappedSessionLayers(elem['id'])});
