@@ -1,5 +1,5 @@
 $('#submitUploadPerson').click(function () {
-    const qas = getPersonalInfoQAs;
+    const qas = getPersonalInfoQAs();
     if (!isQAInputMissing(qas)) {
         uploadQuestion(qas);
         clearPersonalInputFields();
@@ -23,19 +23,19 @@ function getPersonalInfoQAs() {
             "answer": getInputValue("first-name")
         },
         "Last Name": {
-            "question": "Last name?",
+            "question": "Last name",
             "answer": getInputValue("second-name"),
         },
         "Age": {
-            "question": "Age?",
+            "question": "Age",
             "answer": getInputValue("age"),
         },
         "Gender": {
-            "question": "Gender?",
+            "question": "Gender",
             "answer": getRadioButtonValue('gender'),
         },
         "Handiness": {
-            "question": "Handiness?",
+            "question": "Handiness",
             "answer": getRadioButtonValue('hand'),
         },
         "Colorblindness": {
@@ -44,7 +44,7 @@ function getPersonalInfoQAs() {
         },
         "GIS Experience": {
             "question": "Experience in using GIS applications [0 - 100]",
-            "answer": getInputValue("gis-exp")
+            "answer": getInputValue("gis-expert")
         }
     };
     if (qas["Colorblindness"].answer === "yes") {
@@ -96,7 +96,7 @@ function getBrowseQAs() {
             "question": "Why didn't you complete the task successfully?",
             "answer": getInputValue("task-failure")
         }
-    };
+    }
     return qas;
 }
 
@@ -112,6 +112,7 @@ function isQAInputMissing(qas) {
         somethingMissing = true;
         alert('Please fill all fields! Missing: ' + missing.join(', '));
     }
+    console.log('Question missing: ' + somethingMissing);
     return somethingMissing
 }
 
@@ -129,6 +130,7 @@ function getRadioButtonValue(name) {
 }
 
 function uploadQuestion(qas) {
+    console.log('start irterating over questions');
     for (let qaName in qas) {
         sendQuestionPost(qas[qaName])
     }

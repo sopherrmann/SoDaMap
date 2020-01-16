@@ -101,13 +101,6 @@ geocoder.on('result', function(T) {
     addMapSearchEvent(T.result.text, searchText, allSug, bbox, startSearchTime, currentDate)
 });
 
-directions.on('route', function (T) {
-    let steps = T.route["0"].legs["0"].steps;
-    startPoint = (steps["0"].name);
-    endPoint = (steps[steps.length - 1].name)
-});
-
-
 // map click interaction
 map.on('click', function (T) {
     let clickDate = new Date().toISOString();
@@ -205,7 +198,6 @@ function search() {
 
 // routing button
 let value_rout = 0;
-startRoutingTime = new Date().toISOString();
 document.getElementById("routing").addEventListener('click', routing);
 function routing() {
     if (value_rout === 0 && value_search === 1) {
@@ -226,8 +218,6 @@ function routing() {
         value_rout = 0;
         document.getElementById("routing").style.backgroundColor = "";
         document.getElementById("routing").style.color = "";
-        endRoutingTime = new Date().toISOString();
-        add_routing_event();
         map.removeControl(directions);
     }
 }
