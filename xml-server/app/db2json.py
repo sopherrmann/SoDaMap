@@ -144,6 +144,8 @@ class ParseDbJson:
         return map_search
 
     def _get_text_with_suggestions(self, tws: TextWithSuggestion) -> dict:
+        if not tws:
+            return {}
         return {
             'textTyped': tws.text_typed,
             'suggestionChosen': tws.suggestion_chosen,
